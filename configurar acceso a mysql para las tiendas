@@ -1,0 +1,55 @@
+Conectarse al 192.168.50.243 por ssh con putty
+Usuario: administrador
+Clave: facele2024
+Cambiar a superusuario con sudo su y repetir la Clave
+ejecutar mysql -u root
+ya en mysql ejcutar los siguientes comandos
+
+**** Cambiar la ip a la Ip del servidor que se desea autorizar ****
+
+CREATE USER 'apidian'@'192.168.65.5' IDENTIFIED BY 'ApiDIAN2024@@';
+GRANT ALL PRIVILEGES ON *.* TO 'apidian'@'192.168.65.5' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+\q
+
+
+
+JAVA_HOME -> C:\Program Files\Java\jdk-12.0.2
+
+Path -> ;C:\WINDOWS;C:\WINDOWS\system32;%JAVA_HOME%\bin
+
+C:\Program Files\Common Files\VSL Utils;%SystemRoot%\system32;
+%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\;
+C:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\;
+C:\Program Files\Microsoft SQL Server\100\Tools\Binn\;C:\Program Files\Microsoft SQL Server\100\DTS\Binn\;
+C:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\VSShell\Common7\IDE\;
+C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\PrivateAssemblies\;
+C:\Program Files (x86)\Microsoft SQL Server\100\DTS\Binn\;C:\WINDOWS;
+C:\WINDOWS\system32;%JAVA_HOME%\bin
+
+
+Para instalar los drivers de sql server en php7.3
+
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+apt-get update
+ACCEPT_EULA=Y apt-get install -y msodbcsql17
+ACCEPT_EULA=Y apt-get install -y mssql-tools
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+source ~/.bashrc
+apt-get install -y unixodbc-dev
+
+apt-get -y install php-pear php7.3-dev
+update-alternatives --set php /usr/bin/php7.3
+update-alternatives --set phar /usr/bin/phar7.3
+update-alternatives --set phar.phar /usr/bin/phar.phar7.3
+update-alternatives --set phpize /usr/bin/phpize7.3
+update-alternatives --set php-config /usr/bin/php-config7.3
+
+pecl -d php_suffix=7.3 install sqlsrv-5.8.1
+pecl -d php_suffix=7.3 install pdo_sqlsrv-5.8.1
+
+printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/7.3/mods-available/sqlsrv.ini
+printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/7.3/mods-available/pdo_sqlsrv.ini
+phpenmod -v 7.3 sqlsrv pdo_sqlsrv
+service apache2 restart

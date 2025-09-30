@@ -1,0 +1,121 @@
+{
+    "number": "39865",
+    "type_document_id": 1,
+    "date": "2025-05-29",
+    "time": "09:06:51",
+    "resolution_number": "18764072004345",
+    "prefix": "F051",
+    "disable_confirmation_text": true,
+    "establishment_name": "LIBERTADORES",
+    "establishment_address": "Cucuta",
+    "establishment_phone": "123456789",
+    "establishment_municipality": 780,
+    "establishment_email": null,
+    "email_cc_list": [
+        {
+            "email": "CONSUMIDORFINALSUPERLOSMONTES@GMAIL.COM"
+        }
+    ],
+    "customer": {
+        "identification_number": "222222222222",
+        "dv": 7,
+        "name": "CONSUMIDOR FINAL",
+        "merchant_registration": "0000000-00",
+        "type_document_identification_id": 3,
+        "type_organization_id": 2,
+        "municipality_id": 780,
+        "type_regime_id": 2,
+        "type_liability_id": 117
+    },
+    "payment_form": {},
+    "invoice_lines": [
+        {
+            "unit_measure_id": 70,
+            "invoiced_quantity": "1.000",
+            "line_extension_amount": "8823.530",
+            "free_of_charge_indicator": false,
+            "description": "GALLETA FESTIVAL CHIPS.  240GRS 24UND  ",
+            "notes": "",
+            "code": "2003214",
+            "type_item_identification_id": 4,
+            "price_amount": "8823.530",
+            "base_quantity": 1,
+            "tax_totals": [
+                {
+                    "tax_id": 1,
+                    "tax_amount": 1676.47,
+                    "taxable_amount": 8823.53,
+                    "percent": "19.000",
+                    "per_unit_amount": ".0000"
+                }
+            ]
+        },
+        {
+            "unit_measure_id": 70,
+            "invoiced_quantity": "4.000",
+            "line_extension_amount": "51200.000",
+            "free_of_charge_indicator": false,
+            "description": "TOA SANI. NOSOTRAS EXTRA PROTEC. 24UNDS  ",
+            "notes": "",
+            "code": "1109311",
+            "type_item_identification_id": 4,
+            "price_amount": "12800.000",
+            "base_quantity": 1,
+            "tax_totals": [
+                {
+                    "tax_id": 1,
+                    "tax_amount": 0,
+                    "taxable_amount": 51200,
+                    "percent": ".000",
+                    "per_unit_amount": ".0000"
+                }
+            ]
+        },
+        {
+            "unit_measure_id": 70,
+            "invoiced_quantity": "2.000",
+            "line_extension_amount": "26800.000",
+            "free_of_charge_indicator": false,
+            "description": "TOALLA HIGIE NOSOTRAS TLL M BUENAS NOCHES 3UND  ",
+            "notes": "",
+            "code": "2010554",
+            "type_item_identification_id": 4,
+            "price_amount": "13400.000",
+            "base_quantity": 1,
+            "tax_totals": [
+                {
+                    "tax_id": 1,
+                    "tax_amount": 0,
+                    "taxable_amount": 26800,
+                    "percent": ".000",
+                    "per_unit_amount": ".0000"
+                }
+            ]
+        }
+    ],
+    "tax_totals": [
+        {
+            "tax_id": 1,
+            "base_unit_measure": 0,
+            "tax_amount": 0,
+            "percent": ".000",
+            "taxable_amount": 78000,
+            "per_unit_amount": 0
+        },
+        {
+            "tax_id": 1,
+            "base_unit_measure": 0,
+            "tax_amount": 1676.47,
+            "percent": "19.000",
+            "taxable_amount": 8823.53,
+            "per_unit_amount": 0
+        }
+    ],
+    "allowance_charges": [],
+    "legal_monetary_totals": {
+        "line_extension_amount": 86823.53,
+        "tax_exclusive_amount": 86823.53,
+        "tax_inclusive_amount": 88500,
+        "payable_amount": 88500
+    }
+}

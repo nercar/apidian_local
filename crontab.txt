@@ -1,0 +1,92 @@
+# Edit this file to introduce tasks to be run by cron.
+#
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+#
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').
+#
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+#
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+#
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+#
+# For more information see the manual pages of crontab(5) and cron(8)
+#
+#  m   h  dom mon dow   command
+DIA="date +%A"
+DIR=/var/www/html/apidian/demmon
+#  1 CECI
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.0.5  >> $DIR/log_0_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.0.5  >> $DIR/rev_0_5_$($DIA).log
+#  2 SAN LUIS
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.53.5 >> $DIR/log_53_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.53.5 >> $DIR/rev_53_5_$($DIA).log
+#  3 PATIOS
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.54.5 >> $DIR/log_54_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.54.5 >> $DIR/rev_54_5_$($DIA).log
+#  4 MOTILONES
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.55.5 >> $DIR/log_55_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.55.5 >> $DIR/rev_55_5_$($DIA).log
+#  5 TRAPICHES
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.57.5 >> $DIR/log_57_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.57.5 >> $DIR/rev_57_5_$($DIA).log
+#  6 LIBERTADORES
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.59.5 >> $DIR/log_59_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.59.5 >> $DIR/rev_59_5_$($DIA).log
+#  7 CHAPINEROS
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.60.5 >> $DIR/log_60_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.60.5 >> $DIR/rev_60_5_$($DIA).log
+#  8 CEIBA
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.61.5 >> $DIR/log_61_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.61.5 >> $DIR/rev_61_5_$($DIA).log
+#  9 GAZAPA
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.62.5 >> $DIR/log_62_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.62.5 >> $DIR/rev_62_5_$($DIA).log
+# 10 FLORESTA
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.64.5 >> $DIR/log_64_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.64.5 >> $DIR/rev_64_5_$($DIA).log
+# 11 PINAR DEL RIO
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.65.5 >> $DIR/log_65_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.65.5 >> $DIR/rev_65_5_$($DIA).log
+# 12 COLSAG
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.68.5 >> $DIR/log_68_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.68.5 >> $DIR/rev_68_5_$($DIA).log
+# 13 DIAGONAL SANTANDER
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.69.5 >> $DIR/log_69_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.69.5 >> $DIR/rev_69_5_$($DIA).log
+# 14 VILLA ANTIGUA
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php n.a 192.168.70.5 >> $DIR/log_70_5_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php n.a 192.168.70.5 >> $DIR/rev_70_5_$($DIA).log
+#--------------------------#
+# Servidores con instancia #
+#--------------------------#
+# 15 MAGDALENA
+#   *   *   *   *   *    php $DIR/env_DocElePend2API.php productivo 192.168.52.5 >> $DIR/log_52_5_$($DIA).log
+#   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php productivo 192.168.52.5 >> $DIR/rev_52_5_$($DIA).log
+# 16 PLUS
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php plus 192.168.56.6 >> $DIR/log_56_6_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php plus 192.168.56.6 >> $DIR/rev_56_6_$($DIA).log
+# 17 TIENDA VIRTUAL
+   *   *   *   *   *    php $DIR/env_DocElePend2API.php ceibavirtual 192.168.61.5 >> $DIR/log_61_5_tv_$($DIA).log
+   *   *   *   *   *    php $DIR/rev_DocEleEnv2Dian.php ceibavirtual 192.168.61.5 >> $DIR/rev_61_5_tv_$($DIA).log
+#--------------------------#
+# Reenviar Docs Pendientes #
+#--------------------------#
+   0   1   *   *   *    php $DIR/renv_DocElePend2API.php >> $DIR/log_reenv_$($DIA).log
+#--------------------------#
+#   Limpiar logs viejos    #
+#--------------------------#
+  59  23   *   *   *    php $DIR/limpiar_logs.php >> $DIR/log_limpiar_logs.txt
+
+#------------------------------------#
+#   Mover archivos a disco externo   #
+#------------------------------------#
+#  0   0   *   *   *    find /var/www/html/apidian/storage/app/public/900603041/ ! -name "9006030415.jpg" -name "*" -mtime +15 -type f -exec cp "{}" /media/discorespaldo/bk_xml_zip/ \;
