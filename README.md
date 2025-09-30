@@ -10,7 +10,7 @@ Obtener parámetros para software directo - [Aquí](https://www.youtube.com/watc
 
 ## 2.- Ejemplos para la API / Collection POSTMAN
 
-# Primero descargue la herramienta POSTMAN desde internet, y luego importe el archivo collection aquí [postman collection](https://gitlab.buho.la/facturalatam/co-apidian2024/-/blob/master/ApiDianV2.1.postman_collection.json "Click")
+# Primero descargue la herramienta POSTMAN desde internet, y luego importe el archivo collection aquí [postman collection](https://github.com/nercar/apidian_local/blob/nercar/ApiDianV2.1.postman_collection.json "Click")
 
 ## 3.- Instalación y despliegue en local (Windows)
 
