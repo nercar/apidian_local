@@ -4510,7 +4510,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\r\n  \"type_environment_id\": 2,\r\n  \"payroll_type_environment_id\": 2\r\n}"
+                            "raw": "{\r\n  \"type_environment_id\": 1,\r\n  \"payroll_type_environment_id\": 1\r\n}"
                         },
                         "url": {
                             "raw": "http://apidian.int/api/ubl2.1/config/environment",
