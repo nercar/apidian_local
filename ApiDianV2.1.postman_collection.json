@@ -5387,7 +5387,8 @@
                             "raw": "http://apidian.int/apidian2021/public/api/ubl2.1/add-to-batch/credit-note/batch1",
                             "protocol": "http",
                             "host": [
-                                "apidian_local.test"
+                                "apidian",
+                                "int"
                             ],
                             "path": [
                                 "apidian2021",
@@ -5434,7 +5435,8 @@
                             "raw": "http://apidian.int/apidian2021/public/api/ubl2.1/add-to-batch/invoice/batch1",
                             "protocol": "http",
                             "host": [
-                                "apidian_local.test"
+                                "apidian",
+                                "int"
                             ],
                             "path": [
                                 "apidian2021",
@@ -5481,7 +5483,8 @@
                             "raw": "http://apidian.int/apidian2021/public/api/ubl2.1/send-batch/batch1",
                             "protocol": "http",
                             "host": [
-                                "apidian_local.test"
+                                "apidian",
+                                "int"
                             ],
                             "path": [
                                 "apidian2021",
@@ -5527,7 +5530,8 @@
                             "raw": "http://apidian.int/apidian2021/public/api/ubl2.1/add-to-batch/debit-note/batch1",
                             "protocol": "http",
                             "host": [
-                                "apidian_local.test"
+                                "apidian",
+                                "int"
                             ],
                             "path": [
                                 "apidian2021",
@@ -5574,7 +5578,8 @@
                             "raw": "http://apidian.int/apidian2021/public/api/ubl2.1/add-to-batch/invoice-contingency/batch1",
                             "protocol": "http",
                             "host": [
-                                "apidian_local.test"
+                                "apidian",
+                                "int"
                             ],
                             "path": [
                                 "apidian2021",
@@ -5621,7 +5626,8 @@
                             "raw": "http://apidian.int/apidian2021/public/api/ubl2.1/add-to-batch/invoice-aiu/batch1",
                             "protocol": "http",
                             "host": [
-                                "apidian_local.test"
+                                "apidian",
+                                "int"
                             ],
                             "path": [
                                 "apidian2021",
@@ -5668,7 +5674,8 @@
                             "raw": "http://apidian.int/apidian2021/public/api/ubl2.1/add-to-batch/invoice-mandate/batch1",
                             "protocol": "http",
                             "host": [
-                                "apidian_local.test"
+                                "apidian",
+                                "int"
                             ],
                             "path": [
                                 "apidian2021",
@@ -5715,7 +5722,8 @@
                             "raw": "http://apidian.int/apidian2021/public/api/ubl2.1/add-to-batch/invoice-export/batch1",
                             "protocol": "http",
                             "host": [
-                                "apidian_local.test"
+                                "apidian",
+                                "int"
                             ],
                             "path": [
                                 "apidian2021",
