@@ -56,7 +56,7 @@ class InvoiceController extends Controller
 
         // Customer
         $customerAll = collect($request->customer);
-        if(isset($customerAll['municipality_id_fact']))
+        if (isset($customerAll['municipality_id_fact']))
             $customerAll['municipality_id'] = Municipality::where('codefacturador', $customerAll['municipality_id_fact'])->first();
         $customer = new User($customerAll->toArray());
 
@@ -64,7 +64,7 @@ class InvoiceController extends Controller
         $customer->company = new Company($customerAll->toArray());
 
         // Delivery
-        if($request->delivery){
+        if ($request->delivery) {
             $deliveryAll = collect($request->delivery);
             $delivery = new User($deliveryAll->toArray());
 
@@ -77,30 +77,28 @@ class InvoiceController extends Controller
 
             // Delivery party company
             $deliveryparty->company = new Company($deliverypartyAll->toArray());
-        }
-        else{
+        } else {
             $delivery = NULL;
             $deliveryparty = NULL;
         }
 
         // Type operation id
-        if(!$request->type_operation_id)
-          $request->type_operation_id = 10;
+        if (!$request->type_operation_id)
+            $request->type_operation_id = 10;
         $typeoperation = TypeOperation::findOrFail($request->type_operation_id);
 
         // Currency id
-        if(isset($request->idcurrency) and (!is_null($request->idcurrency))){
+        if (isset($request->idcurrency) and (!is_null($request->idcurrency))) {
             $idcurrency = TypeCurrency::findOrFail($request->idcurrency);
             $calculationrate = $request->calculationrate;
             $calculationratedate = $request->calculationratedate;
-        }
-        else{
+        } else {
             $idcurrency = null;
             $calculationrate = null;
             $calculationratedate = null;
-//            $idcurrency = TypeCurrency::findOrFail(35);
-//            $calculationrate = 1;
-//            $calculationratedate = Carbon::now()->format('Y-m-d');
+            //            $idcurrency = TypeCurrency::findOrFail(35);
+            //            $calculationrate = 1;
+            //            $calculationratedate = Carbon::now()->format('Y-m-d');
         }
 
         // Resolution
@@ -116,13 +114,13 @@ class InvoiceController extends Controller
         $notes = $request->notes;
 
         // Order Reference
-        if($request->order_reference)
+        if ($request->order_reference)
             $orderreference = new OrderReference($request->order_reference);
         else
             $orderreference = NULL;
 
         // Health Fields
-        if($request->health_fields)
+        if ($request->health_fields)
             $healthfields = new HealthField($request->health_fields);
         else
             $healthfields = NULL;
@@ -149,16 +147,16 @@ class InvoiceController extends Controller
 
         // Retenciones globales
         $withHoldingTaxTotal = collect();
-//        $withHoldingTaxTotalCount = 0;
-//        $holdingTaxTotal = $request->holding_tax_total;
-        foreach($request->with_holding_tax_total ?? [] as $item) {
-//            $withHoldingTaxTotalCount++;
-//            $holdingTaxTotal = $request->holding_tax_total;
+        //        $withHoldingTaxTotalCount = 0;
+        //        $holdingTaxTotal = $request->holding_tax_total;
+        foreach ($request->with_holding_tax_total ?? [] as $item) {
+            //            $withHoldingTaxTotalCount++;
+            //            $holdingTaxTotal = $request->holding_tax_total;
             $withHoldingTaxTotal->push(new TaxTotal($item));
         }
 
         // Prepaid Payment
-        if($request->prepaid_payment)
+        if ($request->prepaid_payment)
             $prepaidpayment = new PrepaidPayment($request->prepaid_payment);
         else
             $prepaidpayment = NULL;
@@ -178,8 +176,8 @@ class InvoiceController extends Controller
         return [
             'success' => true,
             'message' => "Vista preeliminar #{$resolution->next_consecutive} generada con éxito",
-            'urlinvoicepdf'=>"FES-{$resolution->next_consecutive}.pdf",
-            'base64invoicepdf'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.pdf"))),
+            'urlinvoicepdf' => "FES-{$resolution->next_consecutive}.pdf",
+            'base64invoicepdf' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.pdf"))),
         ];
     }
 
@@ -195,21 +193,20 @@ class InvoiceController extends Controller
         // User
         $user = auth()->user();
         $smtp_parameters = collect($request->smtp_parameters);
-        if(isset($request->smtp_parameters)){
+        if (isset($request->smtp_parameters)) {
             \Config::set('mail.host', $smtp_parameters->toArray()['host']);
             \Config::set('mail.port', $smtp_parameters->toArray()['port']);
             \Config::set('mail.username', $smtp_parameters->toArray()['username']);
             \Config::set('mail.password', $smtp_parameters->toArray()['password']);
             \Config::set('mail.encryption', $smtp_parameters->toArray()['encryption']);
+        } else
+            if ($user->validate_mail_server()) {
+            \Config::set('mail.host', $user->mail_host);
+            \Config::set('mail.port', $user->mail_port);
+            \Config::set('mail.username', $user->mail_username);
+            \Config::set('mail.password', $user->mail_password);
+            \Config::set('mail.encryption', $user->mail_encryption);
         }
-        else
-            if($user->validate_mail_server()){
-                \Config::set('mail.host', $user->mail_host);
-                \Config::set('mail.port', $user->mail_port);
-                \Config::set('mail.username', $user->mail_username);
-                \Config::set('mail.password', $user->mail_password);
-                \Config::set('mail.encryption', $user->mail_encryption);
-            }
 
         // User company
         $company = $user->company;
@@ -217,51 +214,50 @@ class InvoiceController extends Controller
         // Verify Certificate
         $certificate_days_left = 0;
         $c = $this->verify_certificate();
-        if(!$c['success'])
+        if (!$c['success'])
             return $c;
         else
             $certificate_days_left = $c['certificate_days_left'];
 
-        if($company->type_plan->state == false)
+        if ($company->type_plan->state == false)
             return [
                 'success' => false,
                 'message' => 'El plan en el que esta registrado la empresa se encuentra en el momento INACTIVO para enviar documentos electronicos...',
             ];
 
-        if($company->state == false)
+        if ($company->state == false)
             return [
                 'success' => false,
                 'message' => 'La empresa se encuentra en el momento INACTIVA para enviar documentos electronicos...',
             ];
 
-        if($company->type_plan->period != 0 && $company->absolut_plan_documents == 0){
+        if ($company->type_plan->period != 0 && $company->absolut_plan_documents == 0) {
             $firstDate = new DateTime($company->start_plan_date);
             $secondDate = new DateTime(Carbon::now()->format('Y-m-d H:i'));
             $intvl = $firstDate->diff($secondDate);
-            switch($company->type_plan->period){
+            switch ($company->type_plan->period) {
                 case 1:
-                    if($intvl->y >= 1 || $intvl->m >= 1 || $this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
+                    if ($intvl->y >= 1 || $intvl->m >= 1 || $this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
                         return [
                             'success' => false,
                             'message' => 'La empresa ha llegado al limite de tiempo/documentos del plan por mensualidad, por favor renueve su membresia...',
                         ];
                 case 2:
-                    if($intvl->y >= 1 || $this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
+                    if ($intvl->y >= 1 || $this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
                         return [
                             'success' => false,
                             'message' => 'La empresa ha llegado al limite de tiempo/documentos del plan por anualidad, por favor renueve su membresia...',
                         ];
                 case 3:
-                    if($this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
+                    if ($this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
                         return [
                             'success' => false,
                             'message' => 'La empresa ha llegado al limite de documentos del plan por paquetes, por favor renueve su membresia...',
                         ];
             }
-        }
-        else{
-            if($company->absolut_plan_documents != 0){
-                if($this->qty_docs_period("ABSOLUT") >= $company->absolut_plan_documents)
+        } else {
+            if ($company->absolut_plan_documents != 0) {
+                if ($this->qty_docs_period("ABSOLUT") >= $company->absolut_plan_documents)
                     return [
                         'success' => false,
                         'message' => 'La empresa ha llegado al limite de documentos del plan mixto, por favor renueve su membresia...',
@@ -279,7 +275,7 @@ class InvoiceController extends Controller
         $invoice_doc->type_document_id = $request->type_document_id;
         $invoice_doc->number = $request->number;
         $invoice_doc->client_id = 1;
-        $invoice_doc->client =  $request->customer ;
+        $invoice_doc->client =  $request->customer;
         $invoice_doc->currency_id = 35;
         $invoice_doc->date_issue = date("Y-m-d H:i:s");
         $invoice_doc->sale = 1000;
@@ -291,28 +287,28 @@ class InvoiceController extends Controller
         $invoice_doc->version_ubl_id = 1;
         $invoice_doc->ambient_id = 1;
         $invoice_doc->identification_number = $company->identification_number;
-//        $invoice_doc->save();
+        //        $invoice_doc->save();
 
         // Type document
         $typeDocument = TypeDocument::findOrFail($request->type_document_id);
 
         // Customer
         $customerAll = collect($request->customer);
-        if(isset($customerAll['municipality_id_fact']))
+        if (isset($customerAll['municipality_id_fact']))
             $customerAll['municipality_id'] = Municipality::where('codefacturador', $customerAll['municipality_id_fact'])->first();
         $customer = new User($customerAll->toArray());
 
         // Customer company
         $customer->company = new Company($customerAll->toArray());
 
-        if($customer->company->identification_number !== '222222222222' && isset($request->email_pos_customer))
-            return[
+        if ($customer->company->identification_number !== '222222222222' && isset($request->email_pos_customer))
+            return [
                 'success' => false,
                 'message' => 'El campo email_pos_customer solo es valido cuando se envia para el nit 222222222222 - CONSUMIDOR FINAL.',
             ];
 
         // Delivery
-        if($request->delivery){
+        if ($request->delivery) {
             $deliveryAll = collect($request->delivery);
             $delivery = new User($deliveryAll->toArray());
 
@@ -325,39 +321,37 @@ class InvoiceController extends Controller
 
             // Delivery party company
             $deliveryparty->company = new Company($deliverypartyAll->toArray());
-        }
-        else{
+        } else {
             $delivery = NULL;
             $deliveryparty = NULL;
         }
 
         // Type operation id
-        if(!$request->type_operation_id)
-          $request->type_operation_id = 10;
+        if (!$request->type_operation_id)
+            $request->type_operation_id = 10;
         $typeoperation = TypeOperation::findOrFail($request->type_operation_id);
 
         // Currency id
-        if(isset($request->idcurrency) and (!is_null($request->idcurrency))){
+        if (isset($request->idcurrency) and (!is_null($request->idcurrency))) {
             $idcurrency = TypeCurrency::findOrFail($request->idcurrency);
             $calculationrate = $request->calculationrate;
             $calculationratedate = $request->calculationratedate;
-        }
-        else{
+        } else {
             $idcurrency = null;
             $calculationrate = null;
             $calculationratedate = null;
-//            $idcurrency = TypeCurrency::findOrFail($invoice_doc->currency_id);
-//            $calculationrate = 1;
-//            $calculationratedate = Carbon::now()->format('Y-m-d');
+            //            $idcurrency = TypeCurrency::findOrFail($invoice_doc->currency_id);
+            //            $calculationrate = 1;
+            //            $calculationratedate = Carbon::now()->format('Y-m-d');
         }
 
         // Resolution
         $request->resolution->number = $request->number;
         $resolution = $request->resolution;
 
-        if(env('VALIDATE_BEFORE_SENDING', false)){
+        if (env('VALIDATE_BEFORE_SENDING', false)) {
             $doc = Document::where('type_document_id', $request->type_document_id)->where('identification_number', $company->identification_number)->where('prefix', $resolution->prefix)->where('number', $request->number)->where('state_document_id', 1)->get();
-            if(count($doc) > 0)
+            if (count($doc) > 0)
                 return [
                     'success' => false,
                     'message' => 'Este documento ya fue enviado anteriormente, se registra en la base de datos.',
@@ -375,13 +369,13 @@ class InvoiceController extends Controller
         $notes = $request->notes;
 
         // Order Reference
-        if($request->order_reference)
+        if ($request->order_reference)
             $orderreference = new OrderReference($request->order_reference);
         else
             $orderreference = NULL;
 
         // Health Fields
-        if($request->health_fields)
+        if ($request->health_fields)
             $healthfields = new HealthField($request->health_fields);
         else
             $healthfields = NULL;
@@ -408,16 +402,16 @@ class InvoiceController extends Controller
 
         // Retenciones globales
         $withHoldingTaxTotal = collect();
-//        $withHoldingTaxTotalCount = 0;
-//        $holdingTaxTotal = $request->holding_tax_total;
-        foreach($request->with_holding_tax_total ?? [] as $item) {
-//            $withHoldingTaxTotalCount++;
-//            $holdingTaxTotal = $request->holding_tax_total;
+        //        $withHoldingTaxTotalCount = 0;
+        //        $holdingTaxTotal = $request->holding_tax_total;
+        foreach ($request->with_holding_tax_total ?? [] as $item) {
+            //            $withHoldingTaxTotalCount++;
+            //            $holdingTaxTotal = $request->holding_tax_total;
             $withHoldingTaxTotal->push(new TaxTotal($item));
         }
 
         // Prepaid Payment
-        if($request->prepaid_payment)
+        if ($request->prepaid_payment)
             $prepaidpayment = new PrepaidPayment($request->prepaid_payment);
         else
             $prepaidpayment = NULL;
@@ -441,7 +435,7 @@ class InvoiceController extends Controller
         $invoice = $this->createXML(compact('user', 'company', 'customer', 'taxTotals', 'withHoldingTaxTotal', 'resolution', 'paymentForm', 'typeDocument', 'invoiceLines', 'allowanceCharges', 'legalMonetaryTotals', 'date', 'time', 'notes', 'typeoperation', 'orderreference', 'prepaidpayment', 'prepaidpayments', 'delivery', 'deliveryparty', 'request', 'idcurrency', 'calculationrate', 'calculationratedate', 'healthfields'));
 
         // Register Customer
-        if(env('APPLY_SEND_CUSTOMER_CREDENTIALS', TRUE))
+        if (env('APPLY_SEND_CUSTOMER_CREDENTIALS', TRUE))
             $this->registerCustomer($customer, $request->sendmail);
         else
             $this->registerCustomer($customer, $request->send_customer_credentials);
@@ -452,19 +446,18 @@ class InvoiceController extends Controller
         $signInvoice->pin = $company->software->pin;
         $signInvoice->technicalKey = $resolution->technical_key;
 
-        if ($request->GuardarEn){
+        if ($request->GuardarEn) {
             if (!is_dir($request->GuardarEn)) {
                 mkdir($request->GuardarEn);
             }
-        }
-        else{
+        } else {
             if (!is_dir(storage_path("app/public/{$company->identification_number}"))) {
                 mkdir(storage_path("app/public/{$company->identification_number}"));
             }
         }
 
         if ($request->GuardarEn)
-            $signInvoice->GuardarEn = $request->GuardarEn."\\FE-{$resolution->next_consecutive}.xml";
+            $signInvoice->GuardarEn = $request->GuardarEn . "\\FE-{$resolution->next_consecutive}.xml";
         else
             $signInvoice->GuardarEn = storage_path("app/public/{$company->identification_number}/FE-{$resolution->next_consecutive}.xml");
 
@@ -472,7 +465,7 @@ class InvoiceController extends Controller
         $sendBillSync->To = $company->software->url;
         $sendBillSync->fileName = "{$resolution->next_consecutive}.xml";
         if ($request->GuardarEn)
-            $sendBillSync->contentFile = $this->zipBase64($company, $resolution, $signInvoice->sign($invoice), $request->GuardarEn."\\FES-{$resolution->next_consecutive}");
+            $sendBillSync->contentFile = $this->zipBase64($company, $resolution, $signInvoice->sign($invoice), $request->GuardarEn . "\\FES-{$resolution->next_consecutive}");
         else
             $sendBillSync->contentFile = $this->zipBase64($company, $resolution, $signInvoice->sign($invoice), storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}"));
 
@@ -483,8 +476,8 @@ class InvoiceController extends Controller
         $invoice_doc->xml = "FES-{$resolution->next_consecutive}.xml";
         $invoice_doc->pdf = "FES-{$resolution->next_consecutive}.pdf";
         $invoice_doc->client_id = $customer->company->identification_number;
-        $invoice_doc->client =  $request->customer ;
-        if(property_exists($request, 'id_currency'))
+        $invoice_doc->client =  $request->customer;
+        if (property_exists($request, 'id_currency'))
             $invoice_doc->currency_id = $request->id_currency;
         else
             $invoice_doc->currency_id = 35;
@@ -503,71 +496,71 @@ class InvoiceController extends Controller
         $filename = '';
         $respuestadian = '';
         $typeDocument = TypeDocument::findOrFail(7);
-//        $xml = new \DOMDocument;
+        //        $xml = new \DOMDocument;
         $ar = new \DOMDocument;
-        if ($request->GuardarEn){
-            try{
-                $respuestadian = $sendBillSync->signToSend($request->GuardarEn."\\ReqFE-{$resolution->next_consecutive}.xml")->getResponseToObject($request->GuardarEn."\\RptaFE-{$resolution->next_consecutive}.xml");
-                if(isset($respuestadian->html))
+        if ($request->GuardarEn) {
+            try {
+                $respuestadian = $sendBillSync->signToSend($request->GuardarEn . "\\ReqFE-{$resolution->next_consecutive}.xml")->getResponseToObject($request->GuardarEn . "\\RptaFE-{$resolution->next_consecutive}.xml");
+                if (isset($respuestadian->html))
                     return [
                         'success' => false,
                         'message' => "El servicio DIAN no se encuentra disponible en el momento, reintente mas tarde..."
                     ];
 
-                if($respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid == 'true'){
+                if ($respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid == 'true') {
                     $filename = str_replace('nd', 'ad', str_replace('nc', 'ad', str_replace('fv', 'ad', $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName)));
-                    if($request->atacheddocument_name_prefix)
-                        $filename = $request->atacheddocument_name_prefix.$filename;
+                    if ($request->atacheddocument_name_prefix)
+                        $filename = $request->atacheddocument_name_prefix . $filename;
                     $cufecude = $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlDocumentKey;
                     $invoice_doc->state_document_id = 1;
                     $invoice_doc->cufe = $cufecude;
                     $invoice_doc->save();
-                    $signedxml = file_get_contents(storage_path("app/xml/{$company->id}/".$respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName.".xml"));
-//                    $xml->loadXML($signedxml);
-                    if(strpos($signedxml, "</Invoice>") > 0)
+                    $signedxml = file_get_contents(storage_path("app/xml/{$company->id}/" . $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName . ".xml"));
+                    //                    $xml->loadXML($signedxml);
+                    if (strpos($signedxml, "</Invoice>") > 0)
                         $td = '/Invoice';
                     else
-                        if(strpos($signedxml, "</CreditNote>") > 0)
-                            $td = '/CreditNote';
-                        else
-                            $td = '/DebitNote';
+                        if (strpos($signedxml, "</CreditNote>") > 0)
+                        $td = '/CreditNote';
+                    else
+                        $td = '/DebitNote';
                     $appresponsexml = base64_decode($respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlBase64Bytes);
                     $ar->loadXML($appresponsexml);
                     $fechavalidacion = $ar->documentElement->getElementsByTagName('IssueDate')->item(0)->nodeValue;
                     $horavalidacion = $ar->documentElement->getElementsByTagName('IssueTime')->item(0)->nodeValue;
-                    $document_number = $this->ValueXML($signedxml, $td."/cbc:ID/");
+                    $document_number = $this->ValueXML($signedxml, $td . "/cbc:ID/");
                     // Create XML AttachedDocument
                     $attacheddocument = $this->createXML(compact('user', 'company', 'customer', 'resolution', 'typeDocument', 'cufecude', 'signedxml', 'appresponsexml', 'fechavalidacion', 'horavalidacion', 'document_number'));
 
                     // Signature XML
                     $signAttachedDocument = new SignAttachedDocument($company->certificate->path, $company->certificate->password);
-                    $signAttachedDocument->GuardarEn = $GuardarEn."\\{$filename}.xml";
+                    $signAttachedDocument->GuardarEn = $GuardarEn . "\\{$filename}.xml";
 
                     $at = $signAttachedDocument->sign($attacheddocument)->xml;
-//                    $at = str_replace("&gt;", ">", str_replace("&quot;", '"', str_replace("&lt;", "<", $at)));
-                    $file = fopen($GuardarEn."\\{$filename}".".xml", "w");
-//                    $file = fopen($GuardarEn."\\Attachment-".$this->valueXML($signedxml, $td."/cbc:ID/").".xml", "w");
+                    //                    $at = str_replace("&gt;", ">", str_replace("&quot;", '"', str_replace("&lt;", "<", $at)));
+                    $file = fopen($GuardarEn . "\\{$filename}" . ".xml", "w");
+                    //                    $file = fopen($GuardarEn."\\Attachment-".$this->valueXML($signedxml, $td."/cbc:ID/").".xml", "w");
                     fwrite($file, $at);
                     fclose($file);
-                    if(isset($request->annexes))
+                    if (isset($request->annexes))
                         $this->saveAnnexes($request->annexes, $filename);
                     $invoice = Document::where('identification_number', '=', $company->identification_number)
-                                               ->where('customer', '=', $customer->company->identification_number)
-                                               ->where('prefix', '=', $this->ValueXML($signedxml, $td."/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID/"))
-                                               ->where('number', '=', str_replace($this->ValueXML($signedxml, $td."/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID/"), '', $this->ValueXML($signedxml, $td."/cbc:ID/")))
-                                               ->where('state_document_id', '=', 1)->get();
-                    if(isset($request->sendmail)){
-                        if($request->sendmail){
-                            if((count($invoice) > 0 && $customer->company->identification_number != '222222222222') || (count($invoice) > 0 && isset($request->email_pos_customer))){
-                                try{
-                                    if(isset($request->email_pos_customer))
+                        ->where('customer', '=', $customer->company->identification_number)
+                        ->where('prefix', '=', $this->ValueXML($signedxml, $td . "/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID/"))
+                        ->where('number', '=', str_replace($this->ValueXML($signedxml, $td . "/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID/"), '', $this->ValueXML($signedxml, $td . "/cbc:ID/")))
+                        ->where('state_document_id', '=', 1)->get();
+                    if (isset($request->sendmail)) {
+                        if ($request->sendmail) {
+                            if ((count($invoice) > 0 && $customer->company->identification_number != '222222222222') || (count($invoice) > 0 && isset($request->email_pos_customer))) {
+                                try {
+                                    if (isset($request->email_pos_customer))
                                         Mail::to($request->email_pos_customer)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, TRUE, $request));
                                     else
                                         Mail::to($customer->email)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, TRUE, $request));
-                                    if($request->sendmailtome)
+                                    if ($request->sendmailtome)
                                         Mail::to($user->email)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, FALSE, $request));
-                                    if($request->email_cc_list){
-                                        foreach($request->email_cc_list as $email)
+                                    if ($request->email_cc_list) {
+                                        foreach ($request->email_cc_list as $email)
                                             Mail::to($email)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, FALSE, $request));
                                     }
                                     $invoice[0]->send_email_success = 1;
@@ -579,65 +572,63 @@ class InvoiceController extends Controller
                             }
                         }
                     }
-                }
-                else{
-                  $invoice = null;
-                  $at = '';
+                } else {
+                    $invoice = null;
+                    $at = '';
                 }
             } catch (\Exception $e) {
-                return $e->getMessage().' '.preg_replace("/[\r\n|\n|\r]+/", "", json_encode($respuestadian));
+                return $e->getMessage() . ' ' . preg_replace("/[\r\n|\n|\r]+/", "", json_encode($respuestadian));
             }
             return [
                 'message' => "{$typeDocument->name} #{$resolution->next_consecutive} generada con éxito",
                 'send_email_success' => (null !== $invoice && $request->sendmail == true) ?? $invoice[0]->send_email_success == 1,
                 'send_email_date_time' => (null !== $invoice && $request->sendmail == true) ?? Carbon::now()->format('Y-m-d H:i'),
                 'ResponseDian' => $respuestadian,
-                'invoicexml'=>base64_encode(file_get_contents($request->GuardarEn."\\FES-{$resolution->next_consecutive}.xml")),
-                'zipinvoicexml'=>base64_encode(file_get_contents($request->GuardarEn."\\FES-{$resolution->next_consecutive}.zip")),
-                'unsignedinvoicexml'=>base64_encode(file_get_contents($request->GuardarEn."\\FE-{$resolution->next_consecutive}.xml")),
-                'reqfe'=>base64_encode(file_get_contents($request->GuardarEn."\\ReqFE-{$resolution->next_consecutive}.xml")),
-                'rptafe'=>base64_encode(file_get_contents($request->GuardarEn."\\RptaFE-{$resolution->next_consecutive}.xml")),
-                'attacheddocument'=>base64_encode($at),
-                'urlinvoicexml'=>"FES-{$resolution->next_consecutive}.xml",
-                'urlinvoicepdf'=>"FES-{$resolution->next_consecutive}.pdf",
-                'urlinvoiceattached'=>"{$filename}.xml",
+                'invoicexml' => base64_encode(file_get_contents($request->GuardarEn . "\\FES-{$resolution->next_consecutive}.xml")),
+                'zipinvoicexml' => base64_encode(file_get_contents($request->GuardarEn . "\\FES-{$resolution->next_consecutive}.zip")),
+                'unsignedinvoicexml' => base64_encode(file_get_contents($request->GuardarEn . "\\FE-{$resolution->next_consecutive}.xml")),
+                'reqfe' => base64_encode(file_get_contents($request->GuardarEn . "\\ReqFE-{$resolution->next_consecutive}.xml")),
+                'rptafe' => base64_encode(file_get_contents($request->GuardarEn . "\\RptaFE-{$resolution->next_consecutive}.xml")),
+                'attacheddocument' => base64_encode($at),
+                'urlinvoicexml' => "FES-{$resolution->next_consecutive}.xml",
+                'urlinvoicepdf' => "FES-{$resolution->next_consecutive}.pdf",
+                'urlinvoiceattached' => "{$filename}.xml",
                 'cufe' => $signInvoice->ConsultarCUFE(),
                 'QRStr' => $QRStr,
                 'certificate_days_left' => $certificate_days_left,
                 'resolution_days_left' => $this->days_between_dates(Carbon::now()->format('Y-m-d'), $resolution->date_to),
             ];
-        }
-        else{
-            try{
+        } else {
+            try {
                 $respuestadian = $sendBillSync->signToSend(storage_path("app/public/{$company->identification_number}/ReqFE-{$resolution->next_consecutive}.xml"))->getResponseToObject(storage_path("app/public/{$company->identification_number}/RptaFE-{$resolution->next_consecutive}.xml"));
-                if(isset($respuestadian->html))
+                if (isset($respuestadian->html))
                     return [
                         'success' => false,
                         'message' => "El servicio DIAN no se encuentra disponible en el momento, reintente mas tarde..."
                     ];
 
-                if($respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid == 'true'){
+                if ($respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid == 'true') {
                     $filename = str_replace('nd', 'ad', str_replace('nc', 'ad', str_replace('fv', 'ad', $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName)));
-                    if($request->atacheddocument_name_prefix)
-                        $filename = $request->atacheddocument_name_prefix.$filename;
+                    if ($request->atacheddocument_name_prefix)
+                        $filename = $request->atacheddocument_name_prefix . $filename;
                     $cufecude = $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlDocumentKey;
                     $invoice_doc->state_document_id = 1;
                     $invoice_doc->cufe = $cufecude;
                     $invoice_doc->save();
-                    $signedxml = file_get_contents(storage_path("app/xml/{$company->id}/".$respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName.".xml"));
-//                    $xml->loadXML($signedxml);
-                    if(strpos($signedxml, "</Invoice>") > 0)
+                    $signedxml = file_get_contents(storage_path("app/xml/{$company->id}/" . $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName . ".xml"));
+                    //                    $xml->loadXML($signedxml);
+                    if (strpos($signedxml, "</Invoice>") > 0)
                         $td = '/Invoice';
                     else
-                        if(strpos($signedxml, "</CreditNote>") > 0)
-                            $td = '/CreditNote';
-                        else
-                            $td = '/DebitNote';
+                        if (strpos($signedxml, "</CreditNote>") > 0)
+                        $td = '/CreditNote';
+                    else
+                        $td = '/DebitNote';
                     $appresponsexml = base64_decode($respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlBase64Bytes);
                     $ar->loadXML($appresponsexml);
                     $fechavalidacion = $ar->documentElement->getElementsByTagName('IssueDate')->item(0)->nodeValue;
                     $horavalidacion = $ar->documentElement->getElementsByTagName('IssueTime')->item(0)->nodeValue;
-                    $document_number = $this->ValueXML($signedxml, $td."/cbc:ID/");
+                    $document_number = $this->ValueXML($signedxml, $td . "/cbc:ID/");
                     // Create XML AttachedDocument
                     $attacheddocument = $this->createXML(compact('user', 'company', 'customer', 'resolution', 'typeDocument', 'cufecude', 'signedxml', 'appresponsexml', 'fechavalidacion', 'horavalidacion', 'document_number'));
 
@@ -646,30 +637,30 @@ class InvoiceController extends Controller
                     $signAttachedDocument->GuardarEn = storage_path("app/public/{$company->identification_number}/{$filename}.xml");
 
                     $at = $signAttachedDocument->sign($attacheddocument)->xml;
-//                    $at = str_replace("&gt;", ">", str_replace("&quot;", '"', str_replace("&lt;", "<", $at)));
-                    $file = fopen(storage_path("app/public/{$company->identification_number}/{$filename}".".xml"), "w");
-//                    $file = fopen(storage_path("app/public/{$company->identification_number}/Attachment-".$this->valueXML($signedxml, $td."/cbc:ID/").".xml"), "w");
+                    //                    $at = str_replace("&gt;", ">", str_replace("&quot;", '"', str_replace("&lt;", "<", $at)));
+                    $file = fopen(storage_path("app/public/{$company->identification_number}/{$filename}" . ".xml"), "w");
+                    //                    $file = fopen(storage_path("app/public/{$company->identification_number}/Attachment-".$this->valueXML($signedxml, $td."/cbc:ID/").".xml"), "w");
                     fwrite($file, $at);
                     fclose($file);
-                    if(isset($request->annexes))
+                    if (isset($request->annexes))
                         $this->saveAnnexes($request->annexes, $filename);
                     $invoice = Document::where('identification_number', '=', $company->identification_number)
-                                               ->where('customer', '=', $customer->company->identification_number)
-                                               ->where('prefix', '=', $this->ValueXML($signedxml, $td."/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID/"))
-                                               ->where('number', '=', str_replace($this->ValueXML($signedxml, $td."/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID/"), '', $this->ValueXML($signedxml, $td."/cbc:ID/")))
-                                               ->where('state_document_id', '=', 1)->get();
-                    if(isset($request->sendmail)){
-                        if($request->sendmail){
-                            if((count($invoice) > 0 && $customer->company->identification_number != '222222222222') || (count($invoice) > 0 && isset($request->email_pos_customer))){
-                                try{
-                                    if(isset($request->email_pos_customer))
+                        ->where('customer', '=', $customer->company->identification_number)
+                        ->where('prefix', '=', $this->ValueXML($signedxml, $td . "/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID/"))
+                        ->where('number', '=', str_replace($this->ValueXML($signedxml, $td . "/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID/"), '', $this->ValueXML($signedxml, $td . "/cbc:ID/")))
+                        ->where('state_document_id', '=', 1)->get();
+                    if (isset($request->sendmail)) {
+                        if ($request->sendmail) {
+                            if ((count($invoice) > 0 && $customer->company->identification_number != '222222222222') || (count($invoice) > 0 && isset($request->email_pos_customer))) {
+                                try {
+                                    if (isset($request->email_pos_customer))
                                         Mail::to($request->email_pos_customer)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, TRUE, $request));
                                     else
                                         Mail::to($customer->email)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, TRUE, $request));
-                                    if($request->sendmailtome)
+                                    if ($request->sendmailtome)
                                         Mail::to($user->email)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, FALSE, $request));
-                                    if($request->email_cc_list){
-                                        foreach($request->email_cc_list as $email)
+                                    if ($request->email_cc_list) {
+                                        foreach ($request->email_cc_list as $email)
                                             Mail::to($email)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, FALSE, $request));
                                     }
                                     $invoice[0]->send_email_success = 1;
@@ -681,28 +672,27 @@ class InvoiceController extends Controller
                             }
                         }
                     }
-                }
-                else{
-                  $invoice = null;
-                  $at = '';
+                } else {
+                    $invoice = null;
+                    $at = '';
                 }
             } catch (\Exception $e) {
-                return $e->getMessage().' '.preg_replace("/[\r\n|\n|\r]+/", "", json_encode($respuestadian));
+                return $e->getMessage() . ' ' . preg_replace("/[\r\n|\n|\r]+/", "", json_encode($respuestadian));
             }
             return [
                 'message' => "{$typeDocument->name} #{$resolution->next_consecutive} generada con éxito",
                 'send_email_success' => (null !== $invoice && $request->sendmail == true) ?? $invoice[0]->send_email_success == 1,
                 'send_email_date_time' => (null !== $invoice && $request->sendmail == true) ?? Carbon::now()->format('Y-m-d H:i'),
                 'ResponseDian' => $respuestadian,
-                'invoicexml'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.xml"))),
-                'zipinvoicexml'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.zip"))),
-                'unsignedinvoicexml'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FE-{$resolution->next_consecutive}.xml"))),
-                'reqfe'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/ReqFE-{$resolution->next_consecutive}.xml"))),
-                'rptafe'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/RptaFE-{$resolution->next_consecutive}.xml"))),
-                'attacheddocument'=>base64_encode($at),
-                'urlinvoicexml'=>"FES-{$resolution->next_consecutive}.xml",
-                'urlinvoicepdf'=>"FES-{$resolution->next_consecutive}.pdf",
-                'urlinvoiceattached'=>"{$filename}.xml",
+                'invoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.xml"))),
+                'zipinvoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.zip"))),
+                'unsignedinvoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FE-{$resolution->next_consecutive}.xml"))),
+                'reqfe' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/ReqFE-{$resolution->next_consecutive}.xml"))),
+                'rptafe' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/RptaFE-{$resolution->next_consecutive}.xml"))),
+                'attacheddocument' => base64_encode($at),
+                'urlinvoicexml' => "FES-{$resolution->next_consecutive}.xml",
+                'urlinvoicepdf' => "FES-{$resolution->next_consecutive}.pdf",
+                'urlinvoiceattached' => "{$filename}.xml",
                 'cufe' => $signInvoice->ConsultarCUFE(),
                 'QRStr' => $QRStr,
                 'certificate_days_left' => $certificate_days_left,
@@ -730,7 +720,7 @@ class InvoiceController extends Controller
         // Verify Certificate
         $certificate_days_left = 0;
         $c = $this->verify_certificate();
-        if(!$c['success'])
+        if (!$c['success'])
             return $c;
         else
             $certificate_days_left = $c['certificate_days_left'];
@@ -745,7 +735,7 @@ class InvoiceController extends Controller
         $invoice_doc->type_document_id = $request->type_document_id;
         $invoice_doc->number = $request->number;
         $invoice_doc->client_id = 1;
-        $invoice_doc->client =  $request->customer ;
+        $invoice_doc->client =  $request->customer;
         $invoice_doc->currency_id = 35;
         $invoice_doc->date_issue = date("Y-m-d H:i:s");
         $invoice_doc->sale = 1000;
@@ -757,14 +747,14 @@ class InvoiceController extends Controller
         $invoice_doc->version_ubl_id = 1;
         $invoice_doc->ambient_id = 1;
         $invoice_doc->identification_number = $company->identification_number;
-//        $invoice_doc->save();
+        //        $invoice_doc->save();
 
         // Type document
         $typeDocument = TypeDocument::findOrFail($request->type_document_id);
 
         // Customer
         $customerAll = collect($request->customer);
-        if(isset($customerAll['municipality_id_fact']))
+        if (isset($customerAll['municipality_id_fact']))
             $customerAll['municipality_id'] = Municipality::where('codefacturador', $customerAll['municipality_id_fact'])->first();
         $customer = new User($customerAll->toArray());
 
@@ -772,7 +762,7 @@ class InvoiceController extends Controller
         $customer->company = new Company($customerAll->toArray());
 
         // Delivery
-        if($request->delivery){
+        if ($request->delivery) {
             $deliveryAll = collect($request->delivery);
             $delivery = new User($deliveryAll->toArray());
 
@@ -785,30 +775,28 @@ class InvoiceController extends Controller
 
             // Delivery party company
             $deliveryparty->company = new Company($deliverypartyAll->toArray());
-        }
-        else{
+        } else {
             $delivery = NULL;
             $deliveryparty = NULL;
         }
 
         // Type operation id
-        if(!$request->type_operation_id)
-          $request->type_operation_id = 10;
+        if (!$request->type_operation_id)
+            $request->type_operation_id = 10;
         $typeoperation = TypeOperation::findOrFail($request->type_operation_id);
 
         // Currency id
-        if(isset($request->idcurrency) and (!is_null($request->idcurrency))){
+        if (isset($request->idcurrency) and (!is_null($request->idcurrency))) {
             $idcurrency = TypeCurrency::findOrFail($request->idcurrency);
             $calculationrate = $request->calculationrate;
             $calculationratedate = $request->calculationratedate;
-        }
-        else{
+        } else {
             $idcurrency = null;
             $calculationrate = null;
             $calculationratedate = null;
-//            $idcurrency = TypeCurrency::findOrFail($invoice_doc->currency_id);
-//            $calculationrate = 1;
-//            $calculationratedate = Carbon::now()->format('Y-m-d');
+            //            $idcurrency = TypeCurrency::findOrFail($invoice_doc->currency_id);
+            //            $calculationrate = 1;
+            //            $calculationratedate = Carbon::now()->format('Y-m-d');
         }
 
         // Resolution
@@ -816,9 +804,9 @@ class InvoiceController extends Controller
         $request->resolution->number = $request->number;
         $resolution = $request->resolution;
 
-        if(env('VALIDATE_BEFORE_SENDING', false)){
+        if (env('VALIDATE_BEFORE_SENDING', false)) {
             $doc = Document::where('type_document_id', $request->type_document_id)->where('identification_number', $company->identification_number)->where('prefix', $resolution->prefix)->where('number', $request->number)->where('state_document_id', 1)->get();
-            if(count($doc) > 0)
+            if (count($doc) > 0)
                 return [
                     'success' => false,
                     'message' => 'Este documento ya fue enviado anteriormente, se registra en la base de datos.',
@@ -836,13 +824,13 @@ class InvoiceController extends Controller
         $notes = $request->notes;
 
         // Order Reference
-        if($request->order_reference)
+        if ($request->order_reference)
             $orderreference = new OrderReference($request->order_reference);
         else
             $orderreference = NULL;
 
         // Health Fields
-        if($request->health_fields)
+        if ($request->health_fields)
             $healthfields = new HealthField($request->health_fields);
         else
             $healthfields = NULL;
@@ -869,16 +857,16 @@ class InvoiceController extends Controller
 
         // Retenciones globales
         $withHoldingTaxTotal = collect();
-//        $withHoldingTaxTotalCount = 0;
-//        $holdingTaxTotal = $request->holding_tax_total;
-        foreach($request->with_holding_tax_total ?? [] as $item) {
-//            $withHoldingTaxTotalCount++;
-//            $holdingTaxTotal = $request->holding_tax_total;
+        //        $withHoldingTaxTotalCount = 0;
+        //        $holdingTaxTotal = $request->holding_tax_total;
+        foreach ($request->with_holding_tax_total ?? [] as $item) {
+            //            $withHoldingTaxTotalCount++;
+            //            $holdingTaxTotal = $request->holding_tax_total;
             $withHoldingTaxTotal->push(new TaxTotal($item));
         }
 
         // Prepaid Payment
-        if($request->prepaid_payment)
+        if ($request->prepaid_payment)
             $prepaidpayment = new PrepaidPayment($request->prepaid_payment);
         else
             $prepaidpayment = NULL;
@@ -903,7 +891,7 @@ class InvoiceController extends Controller
         $invoice = $this->createXML(compact('user', 'company', 'customer', 'taxTotals', 'withHoldingTaxTotal', 'resolution', 'paymentForm', 'typeDocument', 'invoiceLines', 'allowanceCharges', 'legalMonetaryTotals', 'date', 'time', 'notes', 'typeoperation', 'orderreference', 'prepaidpayment', 'prepaidpayments', 'delivery', 'deliveryparty', 'request', 'idcurrency', 'calculationrate', 'calculationratedate', 'healthfields'));
 
         // Register Customer
-        if(env('APPLY_SEND_CUSTOMER_CREDENTIALS', TRUE))
+        if (env('APPLY_SEND_CUSTOMER_CREDENTIALS', TRUE))
             $this->registerCustomer($customer, $request->sendmail);
         else
             $this->registerCustomer($customer, $request->send_customer_credentials);
@@ -914,13 +902,12 @@ class InvoiceController extends Controller
         $signInvoice->pin = $company->software->pin;
         $signInvoice->technicalKey = $resolution->technical_key;
 
-        if ($request->GuardarEn){
+        if ($request->GuardarEn) {
             if (!is_dir($request->GuardarEn)) {
                 mkdir($request->GuardarEn);
             }
-            $signInvoice->GuardarEn = $request->GuardarEn."\\FE-{$resolution->next_consecutive}.xml";
-        }
-        else{
+            $signInvoice->GuardarEn = $request->GuardarEn . "\\FE-{$resolution->next_consecutive}.xml";
+        } else {
             if (!is_dir(storage_path("app/public/{$company->identification_number}"))) {
                 mkdir(storage_path("app/public/{$company->identification_number}"));
             }
@@ -930,9 +917,9 @@ class InvoiceController extends Controller
         $sendTestSetAsync->To = $company->software->url;
         $sendTestSetAsync->fileName = "{$resolution->next_consecutive}.xml";
         if ($request->GuardarEn)
-          $sendTestSetAsync->contentFile = $this->zipBase64($company, $resolution, $signInvoice->sign($invoice), $request->GuardarEn."\\FES-{$resolution->next_consecutive}");
+            $sendTestSetAsync->contentFile = $this->zipBase64($company, $resolution, $signInvoice->sign($invoice), $request->GuardarEn . "\\FES-{$resolution->next_consecutive}");
         else
-          $sendTestSetAsync->contentFile = $this->zipBase64($company, $resolution, $signInvoice->sign($invoice), storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}"));
+            $sendTestSetAsync->contentFile = $this->zipBase64($company, $resolution, $signInvoice->sign($invoice), storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}"));
         $sendTestSetAsync->testSetId = $testSetId;
 
         $QRStr = $this->createPDF($user, $company, $customer, $typeDocument, $resolution, $date, $time, $paymentForm, $request, $signInvoice->ConsultarCUFE(), "INVOICE", $withHoldingTaxTotal, $notes, $healthfields);
@@ -942,8 +929,8 @@ class InvoiceController extends Controller
         $invoice_doc->xml = "FES-{$resolution->next_consecutive}.xml";
         $invoice_doc->pdf = "FES-{$resolution->next_consecutive}.pdf";
         $invoice_doc->client_id = $customer->company->identification_number;
-        $invoice_doc->client =  $request->customer ;
-        if(property_exists($request, 'id_currency'))
+        $invoice_doc->client =  $request->customer;
+        if (property_exists($request, 'id_currency'))
             $invoice_doc->currency_id = $request->id_currency;
         else
             $invoice_doc->currency_id = 35;
@@ -959,36 +946,35 @@ class InvoiceController extends Controller
         $invoice_doc->identification_number = $company->identification_number;
         $invoice_doc->save();
 
-        if ($request->GuardarEn){
+        if ($request->GuardarEn) {
             return [
                 'message' => "{$typeDocument->name} #{$resolution->next_consecutive} generada con éxito",
-                'ResponseDian' => $sendTestSetAsync->signToSend($request->GuardarEn."\\ReqFE-{$resolution->next_consecutive}.xml")->getResponseToObject($request->GuardarEn."\\RptaFE-{$resolution->next_consecutive}.xml"),
-                'invoicexml'=>base64_encode(file_get_contents($request->GuardarEn."\\FES-{$resolution->next_consecutive}.xml")),
-                'zipinvoicexml'=>base64_encode(file_get_contents($request->GuardarEn."\\FES-{$resolution->next_consecutive}.zip")),
-                'unsignedinvoicexml'=>base64_encode(file_get_contents($request->GuardarEn."\\FE-{$resolution->next_consecutive}.xml")),
-                'reqfe'=>base64_encode(file_get_contents($request->GuardarEn."\\ReqFE-{$resolution->next_consecutive}.xml")),
-                'rptafe'=>base64_encode(file_get_contents($request->GuardarEn."\\RptaFE-{$resolution->next_consecutive}.xml")),
-                'urlinvoicexml'=>"FES-{$resolution->next_consecutive}.xml",
-                'urlinvoicepdf'=>"FES-{$resolution->next_consecutive}.pdf",
-                'urlinvoiceattached'=>"Attachment-{$resolution->next_consecutive}.xml",
+                'ResponseDian' => $sendTestSetAsync->signToSend($request->GuardarEn . "\\ReqFE-{$resolution->next_consecutive}.xml")->getResponseToObject($request->GuardarEn . "\\RptaFE-{$resolution->next_consecutive}.xml"),
+                'invoicexml' => base64_encode(file_get_contents($request->GuardarEn . "\\FES-{$resolution->next_consecutive}.xml")),
+                'zipinvoicexml' => base64_encode(file_get_contents($request->GuardarEn . "\\FES-{$resolution->next_consecutive}.zip")),
+                'unsignedinvoicexml' => base64_encode(file_get_contents($request->GuardarEn . "\\FE-{$resolution->next_consecutive}.xml")),
+                'reqfe' => base64_encode(file_get_contents($request->GuardarEn . "\\ReqFE-{$resolution->next_consecutive}.xml")),
+                'rptafe' => base64_encode(file_get_contents($request->GuardarEn . "\\RptaFE-{$resolution->next_consecutive}.xml")),
+                'urlinvoicexml' => "FES-{$resolution->next_consecutive}.xml",
+                'urlinvoicepdf' => "FES-{$resolution->next_consecutive}.pdf",
+                'urlinvoiceattached' => "Attachment-{$resolution->next_consecutive}.xml",
                 'cufe' => $signInvoice->ConsultarCUFE(),
                 'QRStr' => $QRStr,
                 'certificate_days_left' => $certificate_days_left,
                 'resolution_days_left' => $this->days_between_dates(Carbon::now()->format('Y-m-d'), $resolution->date_to),
             ];
-        }
-        else{
+        } else {
             return [
                 'message' => "{$typeDocument->name} #{$resolution->next_consecutive} generada con éxito",
                 'ResponseDian' => $sendTestSetAsync->signToSend(storage_path("app/public/{$company->identification_number}/ReqFE-{$resolution->next_consecutive}.xml"))->getResponseToObject(storage_path("app/public/{$company->identification_number}/RptaFE-{$resolution->next_consecutive}.xml")),
-                'invoicexml'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.xml"))),
-                'zipinvoicexml'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.zip"))),
-                'unsignedinvoicexml'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FE-{$resolution->next_consecutive}.xml"))),
-                'reqfe'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/ReqFE-{$resolution->next_consecutive}.xml"))),
-                'rptafe'=>base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/RptaFE-{$resolution->next_consecutive}.xml"))),
-                'urlinvoicexml'=>"FES-{$resolution->next_consecutive}.xml",
-                'urlinvoicepdf'=>"FES-{$resolution->next_consecutive}.pdf",
-                'urlinvoiceattached'=>"Attachment-{$resolution->next_consecutive}.xml",
+                'invoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.xml"))),
+                'zipinvoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.zip"))),
+                'unsignedinvoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FE-{$resolution->next_consecutive}.xml"))),
+                'reqfe' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/ReqFE-{$resolution->next_consecutive}.xml"))),
+                'rptafe' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/RptaFE-{$resolution->next_consecutive}.xml"))),
+                'urlinvoicexml' => "FES-{$resolution->next_consecutive}.xml",
+                'urlinvoicepdf' => "FES-{$resolution->next_consecutive}.pdf",
+                'urlinvoiceattached' => "Attachment-{$resolution->next_consecutive}.xml",
                 'cufe' => $signInvoice->ConsultarCUFE(),
                 'QRStr' => $QRStr,
                 'certificate_days_left' => $certificate_days_left,
@@ -1006,29 +992,29 @@ class InvoiceController extends Controller
         $company = $user->company;
         $resolution = $company->resolutions->where('type_document_id', $type)->first();
 
-        if(is_null($prefix) || $prefix == "null"){
+        if (is_null($prefix) || $prefix == "null") {
             //do nothing
-        }else{
+        } else {
             $resolution = $company->resolutions->where('type_document_id', $type)->where('prefix', $prefix)->first();
         }
 
-        try{
-            if(!json_decode($ignore_state_document_id))
-                    $maxValue = DB::table('documents')->where('identification_number', $company->identification_number)
-                                                      ->where('type_document_id', $type)
-                                                      ->where('prefix', $resolution->prefix)
-                                                      ->where('state_document_id', 1)->max(DB::raw('CAST(number AS UNSIGNED)'));
+        try {
+            if (!json_decode($ignore_state_document_id))
+                $maxValue = DB::table('documents')->where('identification_number', $company->identification_number)
+                    ->where('type_document_id', $type)
+                    ->where('prefix', $resolution->prefix)
+                    ->where('state_document_id', 1)->max(DB::raw('CAST(number AS UNSIGNED)'));
             else
-                    $maxValue = DB::table('documents')->where('identification_number', $company->identification_number)
-                                                      ->where('type_document_id', $type)
-                                                      ->where('prefix', $resolution->prefix)
-                                                      ->max(DB::raw('CAST(number AS UNSIGNED)'));
+                $maxValue = DB::table('documents')->where('identification_number', $company->identification_number)
+                    ->where('type_document_id', $type)
+                    ->where('prefix', $resolution->prefix)
+                    ->max(DB::raw('CAST(number AS UNSIGNED)'));
             return [
                 'number' => ($maxValue) ? ((int)$maxValue + 1) : (int)$resolution->from,
                 'success' => true,
                 'prefix' => $resolution->prefix
             ];
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return [
                 'message' => "No se pudo realizar la operacion..",
                 'success' => false,
@@ -1045,12 +1031,254 @@ class InvoiceController extends Controller
         // User company
         $company = $user->company;
         $invoice = Document::where('identification_number', $company->identification_number)->where('type_document_id', $type)->where('state_document_id', 0)->where('number', $number)->latest()->first();
-        if($invoice){
+        if ($invoice) {
             $invoice->state_document_id = 1;
             $invoice->save();
         }
         return [
             'success' => true
+        ];
+    }
+
+    public function recreateZipFile(InvoiceRequest $request)
+    {
+        // User
+        $user = auth()->user();
+        $smtp_parameters = collect($request->smtp_parameters);
+        if (isset($request->smtp_parameters)) {
+            \Config::set('mail.host', $smtp_parameters->toArray()['host']);
+            \Config::set('mail.port', $smtp_parameters->toArray()['port']);
+            \Config::set('mail.username', $smtp_parameters->toArray()['username']);
+            \Config::set('mail.password', $smtp_parameters->toArray()['password']);
+            \Config::set('mail.encryption', $smtp_parameters->toArray()['encryption']);
+        } else
+            if ($user->validate_mail_server()) {
+            \Config::set('mail.host', $user->mail_host);
+            \Config::set('mail.port', $user->mail_port);
+            \Config::set('mail.username', $user->mail_username);
+            \Config::set('mail.password', $user->mail_password);
+            \Config::set('mail.encryption', $user->mail_encryption);
+        }
+        // User company
+        $company = $user->company;
+        // Verify Certificate
+        $certificate_days_left = 0;
+        $c = $this->verify_certificate();
+        if (!$c['success'])
+            return $c;
+        else
+            $certificate_days_left = $c['certificate_days_left'];
+
+        if ($company->type_plan->state == false)
+            return [
+                'success' => false,
+                'message' => 'El plan en el que esta registrado la empresa se encuentra en el momento INACTIVO para enviar documentos electronicos...',
+            ];
+        if ($company->state == false)
+            return [
+                'success' => false,
+                'message' => 'La empresa se encuentra en el momento INACTIVA para enviar documentos electronicos...',
+            ];
+        //Document
+        $invoice_doc = Document::where('type_document_id', $request->type_document_id)
+            ->where('identification_number', $company->identification_number)
+            ->where('prefix', $request->prefix)
+            ->where('number', $request->number)
+            ->where('state_document_id', 1)
+            ->orderBy('id', 'desc')
+            ->first();
+        // Type document
+        $typeDocument = TypeDocument::findOrFail($request->type_document_id);
+        // Customer
+        $customerAll = collect($request->customer);
+        if (isset($customerAll['municipality_id_fact']))
+            $customerAll['municipality_id'] = Municipality::where('codefacturador', $customerAll['municipality_id_fact'])->first();
+        $customer = new User($customerAll->toArray());
+        // Customer company
+        $customer->company = new Company($customerAll->toArray());
+        $typeoperation = TypeOperation::findOrFail($request->type_operation_id);
+        // Currency id
+        $idcurrency = null;
+        $calculationrate = null;
+        $calculationratedate = null;
+        // Resolution
+        $request->resolution->number = $request->number;
+        $resolution = $request->resolution;
+        // Date time
+        $date = $request->date;
+        $time = $request->time;
+        // Notes
+        $notes = $request->notes;
+        // Order Reference
+        $orderreference = NULL;
+        $healthfields = NULL;
+        // Payment form default
+        $paymentFormAll = (object) array_merge($this->paymentFormDefault, $request->payment_form ?? []);
+        $paymentForm = PaymentForm::findOrFail($paymentFormAll->payment_form_id);
+        $paymentForm->payment_method_code = PaymentMethod::findOrFail($paymentFormAll->payment_method_id)->code;
+        $paymentForm->nameMethod = PaymentMethod::findOrFail($paymentFormAll->payment_method_id)->name;
+        $paymentForm->payment_due_date = $paymentFormAll->payment_due_date ?? null;
+        $paymentForm->duration_measure = $paymentFormAll->duration_measure ?? null;
+        // Allowance charges
+        $allowanceCharges = null;
+        // Tax totals
+        $taxTotals = collect();
+        foreach ($request->tax_totals ?? [] as $taxTotal) {
+            $taxTotals->push(new TaxTotal($taxTotal));
+        }
+        // Retenciones globales
+        $withHoldingTaxTotal = null;
+        $prepaidpayment = NULL;
+        // Prepaid Payments
+        $prepaidpayments = null;
+        // Legal monetary totals
+        $legalMonetaryTotals = new LegalMonetaryTotal($request->legal_monetary_totals);
+        // Invoice lines
+        $invoiceLines = collect();
+        foreach ($request->invoice_lines as $invoiceLine) {
+            $invoiceLines->push(new InvoiceLine($invoiceLine));
+        }
+        // Create XML
+        $invoice = $this->createXML(compact(
+            'user',
+            'company',
+            'customer',
+            'taxTotals',
+            'withHoldingTaxTotal',
+            'resolution',
+            'paymentForm',
+            'typeDocument',
+            'invoiceLines',
+            'allowanceCharges',
+            'legalMonetaryTotals',
+            'date',
+            'time',
+            'notes',
+            'typeoperation',
+            'orderreference',
+            'prepaidpayment',
+            'prepaidpayments',
+            'delivery',
+            'deliveryparty',
+            'request',
+            'idcurrency',
+            'calculationrate',
+            'calculationratedate',
+            'healthfields'
+        ));
+        // Signature XML
+        $signInvoice = new SignInvoice($company->certificate->path, $company->certificate->password);
+        $signInvoice->softwareID = $company->software->identifier;
+        $signInvoice->pin = $company->software->pin;
+        $signInvoice->technicalKey = $resolution->technical_key;
+        if (!is_dir(storage_path("app/public/{$company->identification_number}"))) {
+            mkdir(storage_path("app/public/{$company->identification_number}"));
+        }
+        $signInvoice->GuardarEn = storage_path("app/public/{$company->identification_number}/FE-{$resolution->next_consecutive}.xml");
+        $sendBillSync = new SendBillSync($company->certificate->path, $company->certificate->password);
+        $sendBillSync->To = $company->software->url;
+        $sendBillSync->fileName = "{$resolution->next_consecutive}.xml";
+        $sendBillSync->contentFile = $this->zipBase64($company, $resolution, $signInvoice->sign($invoice), storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}"));
+        $QRStr = $this->createPDF($user, $company, $customer, $typeDocument, $resolution, $date, $time, $paymentForm, $request, $signInvoice->ConsultarCUFE(), "INVOICE", $withHoldingTaxTotal, $notes, $healthfields);
+        $filename = '';
+        $respuestadian = '';
+        // $typeDocument = TypeDocument::findOrFail(7);
+        // $ar = new \DOMDocument;
+        // try {
+        //     $respuestadian = $sendBillSync->signToSend(storage_path("app/public/{$company->identification_number}/ReqFE-{$resolution->next_consecutive}.xml"))->getResponseToObject(storage_path("app/public/{$company->identification_number}/RptaFE-{$resolution->next_consecutive}.xml"));
+        //     if (isset($respuestadian->html))
+        //         return [
+        //             'success' => false,
+        //             'message' => "El servicio DIAN no se encuentra disponible en el momento, reintente mas tarde..."
+        //         ];
+        //     if ($respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid == 'true') {
+        //         $filename = str_replace('nd', 'ad', str_replace('nc', 'ad', str_replace('fv', 'ad', $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName)));
+        //         if ($request->atacheddocument_name_prefix)
+        //             $filename = $request->atacheddocument_name_prefix . $filename;
+        //         $cufecude = $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlDocumentKey;
+        //         $invoice_doc->state_document_id = 1;
+        //         $invoice_doc->cufe = $cufecude;
+        //         $invoice_doc->save();
+        //         $signedxml = file_get_contents(storage_path("app/xml/{$company->id}/" . $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName . ".xml"));
+        //         //                    $xml->loadXML($signedxml);
+        //         if (strpos($signedxml, "</Invoice>") > 0)
+        //             $td = '/Invoice';
+        //         else
+        //             if (strpos($signedxml, "</CreditNote>") > 0)
+        //             $td = '/CreditNote';
+        //         else
+        //             $td = '/DebitNote';
+        //         $appresponsexml = base64_decode($respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlBase64Bytes);
+        //         $ar->loadXML($appresponsexml);
+        //         $fechavalidacion = $ar->documentElement->getElementsByTagName('IssueDate')->item(0)->nodeValue;
+        //         $horavalidacion = $ar->documentElement->getElementsByTagName('IssueTime')->item(0)->nodeValue;
+        //         $document_number = $this->ValueXML($signedxml, $td . "/cbc:ID/");
+        //         // Create XML AttachedDocument
+        //         $attacheddocument = $this->createXML(compact('user', 'company', 'customer', 'resolution', 'typeDocument', 'cufecude', 'signedxml', 'appresponsexml', 'fechavalidacion', 'horavalidacion', 'document_number'));
+        //         // Signature XML
+        //         $signAttachedDocument = new SignAttachedDocument($company->certificate->path, $company->certificate->password);
+        //         $signAttachedDocument->GuardarEn = storage_path("app/public/{$company->identification_number}/{$filename}.xml");
+        //         $at = $signAttachedDocument->sign($attacheddocument)->xml;
+        //         //                    $at = str_replace("&gt;", ">", str_replace("&quot;", '"', str_replace("&lt;", "<", $at)));
+        //         $file = fopen(storage_path("app/public/{$company->identification_number}/{$filename}" . ".xml"), "w");
+        //         //                    $file = fopen(storage_path("app/public/{$company->identification_number}/Attachment-".$this->valueXML($signedxml, $td."/cbc:ID/").".xml"), "w");
+        //         fwrite($file, $at);
+        //         fclose($file);
+        //         if (isset($request->annexes))
+        //             $this->saveAnnexes($request->annexes, $filename);
+        //         $invoice = Document::where('identification_number', '=', $company->identification_number)
+        //             ->where('customer', '=', $customer->company->identification_number)
+        //             ->where('prefix', '=', $this->ValueXML($signedxml, $td . "/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID/"))
+        //             ->where('number', '=', str_replace($this->ValueXML($signedxml, $td . "/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:CorporateRegistrationScheme/cbc:ID/"), '', $this->ValueXML($signedxml, $td . "/cbc:ID/")))
+        //             ->where('state_document_id', '=', 1)->get();
+        //         if (isset($request->sendmail)) {
+        //             if ($request->sendmail) {
+        //                 if ((count($invoice) > 0 && $customer->company->identification_number != '222222222222') || (count($invoice) > 0 && isset($request->email_pos_customer))) {
+        //                     try {
+        //                         if (isset($request->email_pos_customer))
+        //                             Mail::to($request->email_pos_customer)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, TRUE, $request));
+        //                         else
+        //                             Mail::to($customer->email)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, TRUE, $request));
+        //                         if ($request->sendmailtome)
+        //                             Mail::to($user->email)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, FALSE, $request));
+        //                         if ($request->email_cc_list) {
+        //                             foreach ($request->email_cc_list as $email)
+        //                                 Mail::to($email)->send(new InvoiceMail($invoice, $customer, $company, FALSE, FALSE, $filename, FALSE, $request));
+        //                         }
+        //                         $invoice[0]->send_email_success = 1;
+        //                         $invoice[0]->send_email_date_time = Carbon::now()->format('Y-m-d H:i');
+        //                         $invoice[0]->save();
+        //                     } catch (\Exception $m) {
+        //                         \Log::debug($m->getMessage());
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     } else {
+        //         $invoice = null;
+        //         $at = '';
+        //     }
+        // } catch (\Exception $e) {
+        //     return $e->getMessage() . ' ' . preg_replace("/[\r\n|\n|\r]+/", "", json_encode($respuestadian));
+        // }
+        return [
+            'message' => "{$typeDocument->name} #{$resolution->next_consecutive} generada con éxito",
+            'send_email_success' => (null !== $invoice && $request->sendmail == true) ?? $invoice[0]->send_email_success == 1,
+            'send_email_date_time' => (null !== $invoice && $request->sendmail == true) ?? Carbon::now()->format('Y-m-d H:i'),
+            'ResponseDian' => $respuestadian,
+            'invoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.xml"))),
+            'zipinvoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.zip"))),
+            'unsignedinvoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FE-{$resolution->next_consecutive}.xml"))),
+            'reqfe' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/ReqFE-{$resolution->next_consecutive}.xml"))),
+            'rptafe' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/RptaFE-{$resolution->next_consecutive}.xml"))),
+            'attacheddocument' => base64_encode($at),
+            'urlinvoicexml' => "FES-{$resolution->next_consecutive}.xml",
+            'urlinvoicepdf' => "FES-{$resolution->next_consecutive}.pdf",
+            // 'urlinvoiceattached' => "{$filename}.xml",
+            'cufe' => $signInvoice->ConsultarCUFE(),
+            'QRStr' => $QRStr,
+            'certificate_days_left' => $certificate_days_left,
+            'resolution_days_left' => $this->days_between_dates(Carbon::now()->format('Y-m-d'), $resolution->date_to),
         ];
     }
 }
