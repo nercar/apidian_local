@@ -1048,7 +1048,7 @@ trait DocumentTrait
             'type_document_id' => $typeDocumentID ?? $resolution->type_document_id,
         ]);
 
-        $name = "{$prefix}{$this->stuffedString($company->identification_number)}{$this->ppp}{$date->format('y')}{$this->stuffedString($send->next_consecutive ?? 1, 8)}{$extension}";
+        $name = "{$prefix}{$resolution->prefix}{$this->stuffedString($company->identification_number)}{$this->ppp}{$date->format('y')}{$this->stuffedString($send->next_consecutive ?? 1, 8)}{$extension}";
 
         $send->increment('next_consecutive');
 
