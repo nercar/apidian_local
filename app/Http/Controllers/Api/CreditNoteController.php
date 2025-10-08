@@ -373,14 +373,14 @@ class CreditNoteController extends Controller
                     ];
 
                 if ($respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid == 'true') {
-                    $filename = str_replace('nc', 'ad', str_replace('ads', 'ad', str_replace('dse', 'ad', str_replace('ni', 'ad', str_replace('nd', 'ad', str_replace('ncq', 'ad', str_replace('fv', 'ad', strtolower($resolution->prefix) . $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName)))))));
+                    $filename = str_replace('nc', 'ad', str_replace('ads', 'ad', str_replace('dse', 'ad', str_replace('ni', 'ad', str_replace('nd', 'ad', str_replace('ncq', 'ad', str_replace('fv', 'ad', $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName)))))));
                     if ($request->atacheddocument_name_prefix)
                         $filename = $request->atacheddocument_name_prefix . $filename;
                     $cufecude = $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlDocumentKey;
                     $invoice_doc->state_document_id = 1;
                     $invoice_doc->cufe = $cufecude;
                     $invoice_doc->save();
-                    $signedxml = file_get_contents(storage_path("app/xml/{$company->id}/" . strtolower($resolution->prefix) . $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName . ".xml"));
+                    $signedxml = file_get_contents(storage_path("app/xml/{$company->id}/" . $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName . ".xml"));
                     //                    $xml->loadXML($signedxml);
                     if (strpos($signedxml, "</Invoice>") > 0)
                         $td = '/Invoice';
@@ -468,14 +468,14 @@ class CreditNoteController extends Controller
                     ];
 
                 if ($respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->IsValid == 'true') {
-                    $filename = str_replace('nc', 'ad', str_replace('ads', 'ad', str_replace('dse', 'ad', str_replace('ni', 'ad', str_replace('nd', 'ad', str_replace('ncq', 'ad', str_replace('fv', 'ad', strtolower($resolution->prefix) . $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName)))))));
+                    $filename = str_replace('nc', 'ad', str_replace('ads', 'ad', str_replace('dse', 'ad', str_replace('ni', 'ad', str_replace('nd', 'ad', str_replace('ncq', 'ad', str_replace('fv', 'ad', $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName)))))));
                     if ($request->atacheddocument_name_prefix)
                         $filename = $request->atacheddocument_name_prefix . $filename;
                     $cufecude = $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlDocumentKey;
                     $invoice_doc->state_document_id = 1;
                     $invoice_doc->cufe = $cufecude;
                     $invoice_doc->save();
-                    $signedxml = file_get_contents(storage_path("app/xml/{$company->id}/" . strtolower($resolution->prefix) . $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName . ".xml"));
+                    $signedxml = file_get_contents(storage_path("app/xml/{$company->id}/" . $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName . ".xml"));
                     //                    $xml->loadXML($signedxml);
                     if (strpos($signedxml, "</Invoice>") > 0)
                         $td = '/Invoice';
