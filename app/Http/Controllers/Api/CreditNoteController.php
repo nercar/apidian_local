@@ -376,7 +376,6 @@ class CreditNoteController extends Controller
                     $filename = str_replace('nc', 'ad', str_replace('ads', 'ad', str_replace('dse', 'ad', str_replace('ni', 'ad', str_replace('nd', 'ad', str_replace('ncq', 'ad', str_replace('fv', 'ad', $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName)))))));
                     if ($request->atacheddocument_name_prefix)
                         $filename = $request->atacheddocument_name_prefix . $filename;
-                    $filename = strtolower($resolution->prefix) . $filename;
                     $cufecude = $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlDocumentKey;
                     $invoice_doc->state_document_id = 1;
                     $invoice_doc->cufe = $cufecude;
@@ -472,7 +471,6 @@ class CreditNoteController extends Controller
                     $filename = str_replace('nc', 'ad', str_replace('ads', 'ad', str_replace('dse', 'ad', str_replace('ni', 'ad', str_replace('nd', 'ad', str_replace('ncq', 'ad', str_replace('fv', 'ad', $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName)))))));
                     if ($request->atacheddocument_name_prefix)
                         $filename = $request->atacheddocument_name_prefix . $filename;
-                    $filename = strtolower($resolution->prefix) . $filename;
                     $cufecude = $respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlDocumentKey;
                     $invoice_doc->state_document_id = 1;
                     $invoice_doc->cufe = $cufecude;
