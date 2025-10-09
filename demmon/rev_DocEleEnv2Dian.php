@@ -8,6 +8,7 @@ if ($argc >= 1) {
     $retval = null;
     exec('tasklist /V | findstr "' . $demonio . '"', $output, $retval);
     // if (count($output) <= 1) {
+    echo count($output);
     print_r($output);
     // /**
     //  * Permite obtener los datos de la base de datos y retornarlos
