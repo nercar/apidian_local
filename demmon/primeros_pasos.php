@@ -66,30 +66,31 @@ if ($argc == 1) {
     }
     envJson2Api($url, $jsObj);
     echo str_repeat('=', 30), "\r\n";
-    // Funcion de enviar la informacion a la APIDian
-    function envJson2Api($url, $jsObj)
-    {
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => json_encode($jsObj),
-            CURLOPT_HTTPHEADER => [
-                "Accept: application/json",
-                "Authorization: Bearer 04cde66691dad4b7aea1729558a0c6f6a1f281ad687c6c92e7d5e32f7f445c0d",
-                "Content-Type: application/json"
-            ],
-        ]);
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        if ($err) echo __LINE__, " cURL Error #: " . $err;
-        else echo __LINE__, ' ', json_encode($response);
-        echo "\r\n";
-    }
+}
+
+// Funcion de enviar la informacion a la APIDian
+function envJson2Api($url, $jsObj)
+{
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_POSTFIELDS => json_encode($jsObj),
+        CURLOPT_HTTPHEADER => [
+            "Accept: application/json",
+            "Authorization: Bearer 04cde66691dad4b7aea1729558a0c6f6a1f281ad687c6c92e7d5e32f7f445c0d",
+            "Content-Type: application/json"
+        ],
+    ]);
+    $response = curl_exec($curl);
+    $err = curl_error($curl);
+    curl_close($curl);
+    if ($err) echo __LINE__, " cURL Error #: " . $err;
+    else echo __LINE__, ' ', json_encode($response);
+    echo "\r\n";
 }
