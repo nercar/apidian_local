@@ -6,7 +6,7 @@ if ($argc == 1) {
     date_default_timezone_set('America/Bogota');
     // Primeros pasos para registrar datos para la ApiDian
     echo str_repeat('=', 30), "\r\n";
-    switch ($$argv[1]) {
+    switch ($argv[1]) {
         case 1:
             // Primer Paso
             echo date('Y.m.d H:i:s'), "1. Registrar Empresa\r\n";
