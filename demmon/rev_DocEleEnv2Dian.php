@@ -108,8 +108,8 @@ if ($argc >= 1) {
                                 exit;
                             }
                         } else {
-                            echo $row['prefijo'] . ' ' . $row['folio'], "\r\n";
                             $cmd = "php renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
+                            echo $cmd;
                             echo exec($cmd);
                         }
                     }
