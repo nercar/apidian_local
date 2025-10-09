@@ -4,10 +4,10 @@ if ($argc >= 1) {
     $instan = strtolower($argv[1]);
     $ipserv = strtolower($argv[2]);
     $strrun = trim($demonio . ' ' . $instan . ' ' . $ipserv);
-    $execstring = "ps aux | grep -v grep | grep '$strrun'";
-    $output = [];
-    exec($execstring, $output);
-    if (count($output) <= 1) {
+    $output = null;
+    $retval = null;
+    exec('tasklist /V | findstr "' . $demonio . '"', $output, $retval);
+    if (count($output) <= 2) {
         /**
          * Permite obtener los datos de la base de datos y retornarlos
          * en modo json o array
@@ -64,27 +64,7 @@ if ($argc >= 1) {
             $conSQLLoc = CxSQLSUCURSAL::ConectSQL($ipserv);
             // Se ejecuta el query en la tienda para actualizar el precio o insertar el articulo es ESARTICULOS
             if ($conSQLLoc !== false) {
-                if ($number != '0') {
-                    getData($conSQLLoc, $ipserv, $cnx, $number, $prefix);
-                } else {
-                    $sql = "SELECT cab.DOCUMENTOFISCAL AS number, cab.PREFIJO AS prefix
-                        FROM BDES_POS.dbo.ESVENTASPOS AS cab
-                        LEFT JOIN BDES_POS.dbo.factura_electronica AS fe ON
-                            fe.prefijo = COALESCE(RTRIM(LTRIM(cab.PREFIJO)), '') AND fe.folio = CAST(cab.DOCUMENTOFISCAL AS VARCHAR)
-                        WHERE fe.cufe IS NULL AND cab.TOTAL != 0 AND (cab.PREFIJO LIKE 'F%' OR cab.PREFIJO LIKE 'D%')
-                        ORDER BY cab.FECHA";
-                    $pend = sqlsrv_query($conSQLLoc, $sql);
-                    if ($pend === false) {
-                        $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
-                        foreach ($errors as $error) {
-                            echo "\r\n", 'ERRORsSQLSucursal: ', __LINE__, ' ', $ipserv, ' ', $error['message'], "\r\n", $sql;
-                        }
-                    } else {
-                        while ($row = sqlsrv_fetch_array($pend, SQLSRV_FETCH_ASSOC)) {
-                            getData($conSQLLoc, $ipserv, $cnx, $row['number'], $row['prefix']);
-                        }
-                    }
-                }
+                getData($conSQLLoc, $ipserv, $cnx, $number, $prefix);
             }
             $conSQLLoc = null;
             $cnx = null;
