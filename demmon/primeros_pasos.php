@@ -92,6 +92,7 @@ function envJson2Api($url, $jsObj)
     $err = curl_error($curl);
     curl_close($curl);
     if ($err) echo __LINE__, " [" . $url . "] ", " cURL Error #: ", $err;
-    else echo __LINE__, ' ', json_decode($response);
+    else echo __LINE__, "\r\n";
+    print_r($response);
     echo "\r\n";
 }
