@@ -3,7 +3,6 @@ if ($argc >= 1) {
     $demonio = $argv[0];
     $instan = strtolower($argv[1]);
     $ipserv = strtolower($argv[2]);
-    $strrun = trim($demonio . ' ' . $instan . ' ' . $ipserv);
     $output = null;
     $retval = null;
     exec('tasklist /V | findstr "' . $demonio . '"', $output, $retval);
