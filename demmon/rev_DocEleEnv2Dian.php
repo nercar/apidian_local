@@ -131,7 +131,7 @@ function valCufeDian($cufe, $prefijo, $folio)
 {
     if ($cufe == '') return false;
     $curl = curl_init();
-    $url  = "http://localhost/api/ubl2.1/xml/document/$cufe";
+    $url  = "http://localhost/apidian/public/api/ubl2.1/xml/document/$cufe";
     curl_setopt_array($curl, [
         CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
