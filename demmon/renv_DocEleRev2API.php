@@ -334,7 +334,7 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
     echo " Enviando [$prefix-$number] -> ";
     $url  = "http://localhost/apidian/public/api/ubl2.1/";
     $url .= ($type_document_id == 1) ? 'invoice' : 'credit-note';
-    echo $conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number, "\r\n";
+    echo $tienda, $number, $prefix, $jsObj, $type_document_id, $identification_number, "\r\n";
     echo $url, "\r\n";
     echo "jsObJ:", json_encode($jsObj);
     exit;
