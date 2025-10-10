@@ -324,8 +324,9 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 }
                 $jsObj->legal_monetary_totals->payable_amount = round($jsObj->legal_monetary_totals->tax_inclusive_amount + $recargo, 2);
             }
-            envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number']);
-            echo "\r\n";
+            // envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number']);
+            echo json_encode($jsObj);
+            // echo "\r\n";
         }
     }
 }
@@ -333,7 +334,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
 function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number)
 {
     $curl = curl_init();
-    $url  = "http://apidian.int/api/ubl2.1/";
+    $url  = "http://localhost/apidian/public/api/ubl2.1/";
     $url .= ($type_document_id == 1) ? 'invoice' : 'credit-note';
     echo " Enviando [$prefix-$number] -> ";
     curl_setopt_array($curl, [
@@ -405,7 +406,7 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
                         AND id = (SELECT MAX(ID) FROM documents
                         WHERE prefix = '$prefix' AND number = '$number')");
             if ($identification_number != "222222222222") {
-                $url  = "http://apidian.int/api/ubl2.1/send-email";
+                $url  = "http://localhost/apidian/public/api/ubl2.1/send-email";
                 echo " Mail [$prefix-$number] -> ";
                 $jsObj = array(
                     "prefix" => "$prefix",
