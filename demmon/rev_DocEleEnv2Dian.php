@@ -71,7 +71,7 @@ if ($argc >= 1) {
                     }
                     exit;
                 }
-                $sql = "SELECT TOP 100 id, prefijo, folio, cufe, CONVERT(VARCHAR(16), created_at, 121) AS fecha
+                $sql = "SELECT TOP 100 PERCENT id, prefijo, folio, cufe, CONVERT(VARCHAR(16), created_at, 121) AS fecha
                     FROM BDES_POS.dbo.factura_electronica
                     WHERE CAST(created_at AS date) >= CAST('2025-10-01' AS date)
                         -- CAST(created_at AS DATE) >= CAST(GETDATE() - 1 AS DATE)
