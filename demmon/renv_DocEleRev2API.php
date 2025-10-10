@@ -3,10 +3,11 @@ if ($argc >= 1) {
     $demonio = $argv[0];
     $instan = strtolower($argv[1]);
     $ipserv = strtolower($argv[2]);
+    $strrun = trim($demonio . ' ' . $instan . ' ' . $ipserv);
+    $execstring = "ps aux | grep -v grep | grep '$strrun'";
     $output = [];
-    $retval = null;
-    exec('tasklist /V | findstr "' . $demonio . '"', $output, $retval);
-    if (count($output) <= 2) {
+    exec($execstring, $output);
+    if (count($output) <= 1) {
         /**
          * Permite obtener los datos de la base de datos y retornarlos
          * en modo json o array
@@ -263,7 +264,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 echo 'L:', $lin, ' ';
             }
             $sql = "SELECT tax_id, porcentaje, per_unit_amount, SUM(tax_amount) AS tax_amount, SUM(taxable_amount) AS taxable_amount, SUM(base_unit_measure) AS base_unit_measure
-                    FROM BDES_POS.dbo.fn_taxes_fe(?, ?) GROUP BY tax_id, porcentaje, per_unit_amount";
+                        FROM BDES_POS.dbo.fn_taxes_fe(?, ?) GROUP BY tax_id, porcentaje, per_unit_amount";
             $datos = array($number, $prefix);
             $taxes = sqlsrv_query($conSQLLoc, $sql, $datos);
             if ($taxes === false) {
@@ -323,8 +324,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 }
                 $jsObj->legal_monetary_totals->payable_amount = round($jsObj->legal_monetary_totals->tax_inclusive_amount + $recargo, 2);
             }
-            // envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number']);
-            echo "jsObJ:", print_r($jsObj);
+            envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number']);
             echo "\r\n";
         }
     }
@@ -332,14 +332,10 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
 
 function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number)
 {
-    $url  = "http://localhost/apidian/public/api/ubl2.1/";
-    $url .= ($type_document_id == 1) ? 'invoice' : 'credit-note';
-    echo $tienda, $number, $prefix, $jsObj, $type_document_id, $identification_number, "\r\n";
-    echo $url, "\r\n";
-    echo "jsObJ:", json_encode($jsObj);
-    exit;
-    echo " Enviando [$prefix-$number] -> ";
     $curl = curl_init();
+    $url  = "http://localhost/api/ubl2.1/";
+    $url .= ($type_document_id == 1) ? 'invoice' : 'credit-note';
+    echo " Enviando [$prefix-$number] -> ";
     curl_setopt_array($curl, [
         CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
@@ -404,12 +400,12 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
                     echo "\r\n", 'ERRORsSQLSucursal: ', __LINE__, ' ', $tienda, ' ', $error['message'], "\r\n", $sql;
                 }
             }
-            $idfac = $cnx->query("SELECT MAX(ID) idfac FROM documents WHERE prefix = '$prefix' AND number = '$number'")->fetchAll(PDO::FETCH_ASSOC);
-            $idfac = $idfac[0]['idfac'];
             $cnx->query("UPDATE documents SET state_document_id = 1, cufe = '$cufe', updated_at = CURRENT_TIMESTAMP
-                        WHERE prefix = '$prefix' AND number = '$number' AND id = $idfac");
+                        WHERE prefix = '$prefix' AND number = '$number'
+                        AND id = (SELECT MAX(ID) FROM documents
+                        WHERE prefix = '$prefix' AND number = '$number')");
             if ($identification_number != "222222222222") {
-                $url  = "http://localhost/apidian/public/api/ubl2.1/send-email";
+                $url  = "http://localhost/api/ubl2.1/send-email";
                 echo " Mail [$prefix-$number] -> ";
                 $jsObj = array(
                     "prefix" => "$prefix",
@@ -447,10 +443,10 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
                 !isset($response->ResponseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->ErrorMessage) &&
                 !isset($response->ResponseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->StatusMessage)
             ) {
-                echo __LINE__, ' ', json_encode($response), "\r\n";
+                echo __LINE__, ' ', substr(json_encode($response), 0, 300), "\r\n";
                 echo json_encode($jsObj), "\r\n";
             } else if (!isset($response->ResponseDian)) {
-                echo __LINE__, ' ', json_encode($response), "\r\n";
+                echo __LINE__, ' ', substr(json_encode($response), 0, 300), "\r\n";
             } else {
                 $reglaLGC15 = json_encode($response->ResponseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->ErrorMessage);
                 if (stripos($reglaLGC15, 'Regla: LGC15, Rechazo:')) {
