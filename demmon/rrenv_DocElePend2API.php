@@ -354,7 +354,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
 function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number)
 {
     $curl = curl_init();
-    $url  = "http://localhost/api/ubl2.1/";
+    $url  = "http://localhost/apidian/public/api/ubl2.1/";
     $url .= ($type_document_id == 1) ? 'invoice' : 'credit-note';
     echo " Enviando [$prefix-$number] -> ";
     curl_setopt_array($curl, [
@@ -426,7 +426,7 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
             $cnx->query("UPDATE documents SET state_document_id = 1, cufe = '$cufe', updated_at = CURRENT_TIMESTAMP
                         WHERE prefix = '$prefix' AND number = '$number' AND id = $idfac");
             if ($identification_number != "222222222222") {
-                $url  = "http://localhost/api/ubl2.1/send-email";
+                $url  = "http://localhost/apidian/public/api/ubl2.1/send-email";
                 echo " Mail [$prefix-$number] -> ";
                 $jsObj = array(
                     "prefix" => "$prefix",
