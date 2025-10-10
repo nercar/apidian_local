@@ -4,9 +4,9 @@ if ($argc >= 1) {
     $instan = strtolower($argv[1]);
     $ipserv = strtolower($argv[2]);
     $strrun = trim($demonio . ' ' . $instan . ' ' . $ipserv);
-    $output = null;
+    $output = [];
     $retval = null;
-    exec('tasklist /V | findstr "' . $demonio . '"', $output, $retval);
+    shell_exec('tasklist /V | findstr "' . $demonio . '"', $output, $retval);
     if (count($output) <= 2) {
         /**
          * Permite obtener los datos de la base de datos y retornarlos
@@ -110,8 +110,8 @@ if ($argc >= 1) {
                             }
                         } else {
                             $cmd = "php renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
-                            echo $cmd;
-                            echo exec($cmd);
+                            // echo $cmd;
+                            echo shell_exec($cmd);
                         }
                     }
                 }
