@@ -109,7 +109,8 @@ if ($argc >= 1) {
                                 exit;
                             }
                         } else {
-                            $cmd = "php renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
+                            $dir = __DIR__ . DIRECTORY_SEPARATOR;
+                            $cmd = "php $dirrenv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
                             // echo $cmd;
                             echo shell_exec($cmd);
                         }
