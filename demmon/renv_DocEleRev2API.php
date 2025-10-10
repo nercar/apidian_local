@@ -357,6 +357,8 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
         echo __LINE__, " cURL Error #: " . $err;
     } else {
         $response = json_decode($response);
+        echo json_encode($response);
+        exit;
         $valido = false;
         $xmldocumentkey = '';
         if ($response->message == 'Este documento ya fue enviado anteriormente, se registra en la base de datos.') {
