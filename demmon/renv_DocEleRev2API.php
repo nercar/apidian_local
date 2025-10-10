@@ -263,7 +263,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 echo 'L:', $lin, ' ';
             }
             $sql = "SELECT tax_id, porcentaje, per_unit_amount, SUM(tax_amount) AS tax_amount, SUM(taxable_amount) AS taxable_amount, SUM(base_unit_measure) AS base_unit_measure
-                        FROM BDES_POS.dbo.fn_taxes_fe(?, ?) GROUP BY tax_id, porcentaje, per_unit_amount";
+                    FROM BDES_POS.dbo.fn_taxes_fe(?, ?) GROUP BY tax_id, porcentaje, per_unit_amount";
             $datos = array($number, $prefix);
             $taxes = sqlsrv_query($conSQLLoc, $sql, $datos);
             if ($taxes === false) {
@@ -324,7 +324,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 $jsObj->legal_monetary_totals->payable_amount = round($jsObj->legal_monetary_totals->tax_inclusive_amount + $recargo, 2);
             }
             // envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number']);
-            echo json_encode($jsObj);
+            echo "jsObJ:", json_encode($jsObj);
             echo "\r\n";
         }
     }
