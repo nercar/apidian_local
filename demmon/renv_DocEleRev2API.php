@@ -442,10 +442,10 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
                 !isset($response->ResponseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->ErrorMessage) &&
                 !isset($response->ResponseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->StatusMessage)
             ) {
-                echo __LINE__, ' ', substr(json_encode($response), 0, 300), "\r\n";
+                echo __LINE__, ' ', json_encode($response), "\r\n";
                 echo json_encode($jsObj), "\r\n";
             } else if (!isset($response->ResponseDian)) {
-                echo __LINE__, ' ', substr(json_encode($response), 0, 300), "\r\n";
+                echo __LINE__, ' ', json_encode($response), "\r\n";
             } else {
                 $reglaLGC15 = json_encode($response->ResponseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->ErrorMessage);
                 if (stripos($reglaLGC15, 'Regla: LGC15, Rechazo:')) {
