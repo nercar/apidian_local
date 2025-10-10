@@ -74,6 +74,7 @@ if ($argc >= 1) {
                 $sql = "SELECT TOP 100 id, prefijo, folio, cufe, CONVERT(VARCHAR(16), created_at, 121) AS fecha
                     FROM BDES_POS.dbo.factura_electronica
                     WHERE CAST(created_at AS date) >= CAST('2025-10-01' AS date)
+                        -- CAST(created_at AS DATE) >= CAST(GETDATE() - 1 AS DATE)
                         AND DATEADD(MINUTE, -10, created_at) < CURRENT_TIMESTAMP
                         AND (cufe_verificado < 2 OR COALESCE(cufe, '') = '')
                     ORDER BY created_at DESC";
