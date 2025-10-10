@@ -421,10 +421,10 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
                     echo "\r\n", 'ERRORsSQLSucursal: ', __LINE__, ' ', $tienda, ' ', $error['message'], "\r\n", $sql;
                 }
             }
+            $idfac = $cnx->query("SELECT MAX(ID) idfac FROM documents WHERE prefix = '$prefix' AND number = '$number'")->fetchAll(PDO::FETCH_ASSOC);
+            $idfac = $idfac[0]['idfac'];
             $cnx->query("UPDATE documents SET state_document_id = 1, cufe = '$cufe', updated_at = CURRENT_TIMESTAMP
-                        WHERE prefix = '$prefix' AND number = '$number'
-                        AND id = (SELECT MAX(ID) FROM documents
-                        WHERE prefix = '$prefix' AND number = '$number')");
+                        WHERE prefix = '$prefix' AND number = '$number' AND id = $idfac");
             if ($identification_number != "222222222222") {
                 $url  = "http://localhost/api/ubl2.1/send-email";
                 echo " Mail [$prefix-$number] -> ";

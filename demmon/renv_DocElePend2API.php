@@ -38,7 +38,7 @@ if (count($output) <= 1) {
             }
         }
         foreach ($docs as $doc) {
-            $cmd = 'php /var/www/html/apidian/demmon/cpenv_DocElePend2API.php ' . $doc['instancia'] . ' ' . $doc['ip_tienda'] . ' ' . $doc['prefix'] . ' ' . $doc['number'];
+            $cmd = 'php cpenv_DocElePend2API.php ' . $doc['instancia'] . ' ' . $doc['ip_tienda'] . ' ' . $doc['prefix'] . ' ' . $doc['number'];
             echo exec($cmd), "\r\n";
         }
         $cnx = null;
