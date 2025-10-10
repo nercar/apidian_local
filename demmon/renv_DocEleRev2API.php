@@ -331,10 +331,12 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
 
 function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number)
 {
-    $curl = curl_init();
+    echo " Enviando [$prefix-$number] -> ";
     $url  = "http://localhost/apidian/public/api/ubl2.1/";
     $url .= ($type_document_id == 1) ? 'invoice' : 'credit-note';
-    echo " Enviando [$prefix-$number] -> ";
+    echo $url, "\r\n", json_encode($jsObj);
+    exit;
+    $curl = curl_init();
     curl_setopt_array($curl, [
         CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
@@ -357,8 +359,6 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
         echo __LINE__, " cURL Error #: " . $err;
     } else {
         $response = json_decode($response);
-        echo json_encode($response);
-        exit;
         $valido = false;
         $xmldocumentkey = '';
         if ($response->message == 'Este documento ya fue enviado anteriormente, se registra en la base de datos.') {
