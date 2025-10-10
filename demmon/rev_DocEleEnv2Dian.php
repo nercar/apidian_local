@@ -6,7 +6,7 @@ if ($argc >= 1) {
     $strrun = trim($demonio . ' ' . $instan . ' ' . $ipserv);
     $output = [];
     $retval = null;
-    shell_exec('tasklist /V | findstr "' . $demonio . '"', $output, $retval);
+    exec('tasklist /V | findstr "' . $demonio . '"', $output, $retval);
     if (count($output) <= 2) {
         /**
          * Permite obtener los datos de la base de datos y retornarlos
