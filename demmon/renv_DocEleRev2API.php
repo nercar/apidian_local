@@ -324,7 +324,9 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 }
                 $jsObj->legal_monetary_totals->payable_amount = round($jsObj->legal_monetary_totals->tax_inclusive_amount + $recargo, 2);
             }
-            envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number']);
+            // envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number']);
+            echo "\r\njsObj:\r\n";
+            print_r($jsObj);
             echo "\r\n";
         }
     }
