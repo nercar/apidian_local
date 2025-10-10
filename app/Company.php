@@ -12,7 +12,28 @@ class Company extends Model
      * @var array
      */
     protected $with = [
-        'user', 'software', 'certificate', 'resolutions', 'language', 'tax', 'country', 'type_document_identification', 'type_operation', 'type_environment', 'eqdocs_type_environment', 'payroll_type_environment','type_currency', 'type_organization', 'municipality', 'type_liability', 'type_regime', 'send', 'type_plan', 'type_plan2', 'type_plan3', 'type_plan4',
+        'user',
+        'software',
+        'certificate',
+        'resolutions',
+        'language',
+        'tax',
+        'country',
+        'type_document_identification',
+        'type_operation',
+        'type_environment',
+        'eqdocs_type_environment',
+        'payroll_type_environment',
+        'type_currency',
+        'type_organization',
+        'municipality',
+        'type_liability',
+        'type_regime',
+        'send',
+        'type_plan',
+        'type_plan2',
+        'type_plan3',
+        'type_plan4',
     ];
 
     /**
@@ -21,7 +42,43 @@ class Company extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'identification_number', 'dv', 'language_id', 'tax_id', 'type_environment_id', 'payroll_type_environment_id', 'eqdocs_type_environment_id', 'type_operation_id', 'type_document_identification_id', 'country_id', 'type_currency_id', 'type_organization_id', 'type_regime_id', 'type_liability_id', 'municipality_id', 'merchant_registration', 'address', 'phone', 'password', 'newpassword', 'type_plan_id', 'type_plan2_id', 'type_plan3_id', 'type_plan4_id', 'start_plan_date', 'start_plan_date2', 'start_plan_date3', 'start_plan_date4', 'absolut_start_plan_date', 'municipality_name', 'state_name', 'state', 'absolut_plan_documents', 'allow_seller_login',
+        'user_id',
+        'identification_number',
+        'dv',
+        'language_id',
+        'tax_id',
+        'type_environment_id',
+        'payroll_type_environment_id',
+        'eqdocs_type_environment_id',
+        'type_operation_id',
+        'type_document_identification_id',
+        'country_id',
+        'type_currency_id',
+        'type_organization_id',
+        'type_regime_id',
+        'type_liability_id',
+        'municipality_id',
+        'merchant_registration',
+        'address',
+        'phone',
+        'password',
+        'newpassword',
+        'type_plan_id',
+        'type_plan2_id',
+        'type_plan3_id',
+        'type_plan4_id',
+        'start_plan_date',
+        'start_plan_date2',
+        'start_plan_date3',
+        'start_plan_date4',
+        'absolut_start_plan_date',
+        'municipality_name',
+        'state_name',
+        'state',
+        'absolut_plan_documents',
+        'allow_seller_login',
+        'fnote_pdf',
+        'email_pdf',
     ];
 
     /**
@@ -30,7 +87,27 @@ class Company extends Model
      * @var array
      */
     protected $hidden = [
-        'software', 'certificate', 'resolutions', 'language', 'tax', 'country', 'type_document_identification', 'type_operation', 'type_environment', 'eqdocs_type_environment', 'payroll_type_environment', 'type_currency', 'type_organization', 'municipality', 'type_liability', 'type_regime', 'type_plan', 'type_plan2', 'type_plan3', 'type_plan4', 'absolut_plan_documents',
+        'software',
+        'certificate',
+        'resolutions',
+        'language',
+        'tax',
+        'country',
+        'type_document_identification',
+        'type_operation',
+        'type_environment',
+        'eqdocs_type_environment',
+        'payroll_type_environment',
+        'type_currency',
+        'type_organization',
+        'municipality',
+        'type_liability',
+        'type_regime',
+        'type_plan',
+        'type_plan2',
+        'type_plan3',
+        'type_plan4',
+        'absolut_plan_documents',
     ];
 
     /**
@@ -212,7 +289,7 @@ class Company extends Model
             ->where('year', now()->format('Y'));
     }
 
-     /**
+    /**
      * Get the type operation that owns the company.
      */
     public function user()

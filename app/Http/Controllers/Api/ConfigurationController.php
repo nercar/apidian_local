@@ -268,6 +268,16 @@ class ConfigurationController extends Controller
                 else
                     $absolut_start_plan_date = $user->company->absolut_start_plan_date;
 
+                if (isset($request->fnote_pdf))
+                    $fnote_pdf = $request->fnote_pdf;
+                else
+                    $fnote_pdf = NULL;
+
+                if (isset($request->email_pdf))
+                    $email_pdf = $request->email_pdf;
+                else
+                    $email_pdf = NULL;
+
                 $user->update([
                     'name' => $request->business_name,
                     'email' => $request->email,
@@ -306,6 +316,8 @@ class ConfigurationController extends Controller
                     'start_plan_date3' => $start_plan_date3,
                     'start_plan_date4' => $start_plan_date4,
                     'absolut_start_plan_date' => $absolut_start_plan_date,
+                    'fnote_pdf' => $fnote_pdf,
+                    'email_pdf' => $email_pdf
                 ]);
                 $user->save();
             }
