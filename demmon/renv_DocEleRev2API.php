@@ -217,7 +217,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                     $detalleFactura->invoiced_quantity = $rowDet['invoiced_quantity'];
                     $detalleFactura->line_extension_amount = $rowDet['line_extension_amount'];
                     $detalleFactura->free_of_charge_indicator = $rowDet['price_amount'] == 0;
-                    $detalleFactura->description = mb_convert_encoding($rowDet['description'], 'utf8');
+                    $detalleFactura->description = mb_convert_encoding($rowDet['description'], 'UTF-8', 'ISO-8859-1');
                     $detalleFactura->notes = "";
                     $detalleFactura->code = $rowDet['code'];
                     $detalleFactura->type_item_identification_id = 4;
