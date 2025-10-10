@@ -58,7 +58,7 @@ if ($argc >= 1) {
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // Disable errors in the form of exceptions
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // Make the default fetch be an associative array
             ];
-            $conStr = sprintf("mysql:host=%s;dbname=%s;charset=utf8", SYS_HOSTMYSQL, SYS_BBDDMYSQL);
+            $conStr = sprintf("mysql:host=%s;dbname=%s;charset=utf8mb4", SYS_HOSTMYSQL, SYS_BBDDMYSQL);
             $cnx = new PDO($conStr, SYS_USERMYSQL, SYS_PASSMYSQL, $options);
             $ipserv .= $instan == 'n.a' ? '' : chr(92) . $instan;
             $conSQLLoc = CxSQLSUCURSAL::ConectSQL($ipserv);
@@ -217,7 +217,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                     $detalleFactura->invoiced_quantity = $rowDet['invoiced_quantity'];
                     $detalleFactura->line_extension_amount = $rowDet['line_extension_amount'];
                     $detalleFactura->free_of_charge_indicator = $rowDet['price_amount'] == 0;
-                    $detalleFactura->description = $rowDet['description'];
+                    $detalleFactura->description = mb_convert_encoding($rowDet['description'], 'UTF-8', 'Windows-1252');
                     $detalleFactura->notes = "";
                     $detalleFactura->code = $rowDet['code'];
                     $detalleFactura->type_item_identification_id = 4;
