@@ -51,28 +51,33 @@ class ConfigurationController extends Controller
             ->only('store');
     }
 
-    public function table_health_type_document_identifications(){
+    public function table_health_type_document_identifications()
+    {
         $health_type_document_identifications = HealthTypeDocumentIdentification::all();
         return compact('health_type_document_identifications');
     }
 
-    public function table_health_type_users(){
+    public function table_health_type_users()
+    {
         $health_type_users = HealthTypeUser::all();
         return compact('health_type_users');
     }
 
-    public function table_health_contracting_payment_methods(){
+    public function table_health_contracting_payment_methods()
+    {
         $health_contracting_payment_methods = HealthContractingPaymentMethod::all();
         return compact('health_contracting_payment_methods');
     }
 
-    public function table_health_coverages(){
+    public function table_health_coverages()
+    {
         $health_coverages = HealthCoverage::all();
         return compact('health_coverages');
     }
 
-    public function table_resolutions($identification_number){
-        try{
+    public function table_resolutions($identification_number)
+    {
+        try {
             $resolutions = Resolution::where('company_id', Company::where('identification_number', $identification_number)->firstOrFail()->id)->get();
             return compact('resolutions');
         } catch (Exception $e) {
@@ -106,27 +111,25 @@ class ConfigurationController extends Controller
      */
     public function store(ConfigurationRequest $request, $nit, $dv = null)
     {
-//        if($this->validarDigVerifDIAN($nit) != $dv)
-//            return [
-//                'message' => 'Error, el digito de verificacion no es valido para este NIT.',
-//                'success' => false,
-//            ];
+        //        if($this->validarDigVerifDIAN($nit) != $dv)
+        //            return [
+        //                'message' => 'Error, el digito de verificacion no es valido para este NIT.',
+        //                'success' => false,
+        //            ];
 
         DB::beginTransaction();
 
         try {
-//            $password = Str::random(80);
+            //            $password = Str::random(80);
             $password = $nit;
 
-            if(count(Company::where('identification_number', '=', $nit)->get()) > 0)
-            {
+            if (count(Company::where('identification_number', '=', $nit)->get()) > 0) {
                 $operacion = "UPDATE";
                 $user = User::where('id', '=', Company::where('identification_number', '=', $nit)->get()->first()->user_id)->get()->first();
-            }
-            else
+            } else
                 $operacion = "CREATE";
 
-            if($operacion == "CREATE"){
+            if ($operacion == "CREATE") {
                 $user = User::create([
                     'name' => $request->business_name,
                     'email' => $request->email,
@@ -139,35 +142,45 @@ class ConfigurationController extends Controller
                     'mail_encryption' => $request->mail_encryption,
                 ]);
 
-                if($user->id_administrator == null && isset($request->id_administrator) && $request->id_administrator != null)
-                  $user->id_administrator = $request->id_administrator;
+                if ($user->id_administrator == null && isset($request->id_administrator) && $request->id_administrator != null)
+                    $user->id_administrator = $request->id_administrator;
 
                 $user->api_token = hash('sha256', $password);
 
-                if(isset($request->type_plan_id))
+                if (isset($request->type_plan_id))
                     $start_plan_date = Carbon::now()->format('Y-m-d H:i');
                 else
                     $start_plan_date = NULL;
 
-                if(isset($request->type_plan2_id))
+                if (isset($request->type_plan2_id))
                     $start_plan_date2 = Carbon::now()->format('Y-m-d H:i');
                 else
                     $start_plan_date2 = NULL;
 
-                if(isset($request->type_plan3_id))
+                if (isset($request->type_plan3_id))
                     $start_plan_date3 = Carbon::now()->format('Y-m-d H:i');
                 else
                     $start_plan_date3 = NULL;
 
-                if(isset($request->type_plan4_id))
+                if (isset($request->type_plan4_id))
                     $start_plan_date4 = Carbon::now()->format('Y-m-d H:i');
                 else
                     $start_plan_date4 = NULL;
 
-                if(isset($request->absolut_plan_documents))
+                if (isset($request->absolut_plan_documents))
                     $absolut_start_plan_date = Carbon::now()->format('Y-m-d H:i');
                 else
                     $absolut_start_plan_date = NULL;
+
+                if (isset($request->fnote_pdf))
+                    $fnote_pdf = $request->fnote_pdf;
+                else
+                    $fnote_pdf = NULL;
+
+                if (isset($request->email_pdf))
+                    $email_pdf = $request->email_pdf;
+                else
+                    $email_pdf = NULL;
 
                 $user->company()->create([
                     'user_id' => $user->id,
@@ -200,12 +213,13 @@ class ConfigurationController extends Controller
                     'start_plan_date3' => $start_plan_date3,
                     'start_plan_date4' => $start_plan_date4,
                     'absolut_start_plan_date' => $absolut_start_plan_date,
+                    'fnote_pdf' => $fnote_pdf,
+                    'email_pdf' => $email_pdf
                 ]);
 
                 $user->save();
-            }
-            else{
-                if(count(User::where('email', '=', $request->email)->where('id', '!=', Company::where('identification_number', '=', $nit)->get()->first()->user_id)->get()) > 0){
+            } else {
+                if (count(User::where('email', '=', $request->email)->where('id', '!=', Company::where('identification_number', '=', $nit)->get()->first()->user_id)->get()) > 0) {
                     DB::rollBack();
 
                     return [
@@ -214,45 +228,45 @@ class ConfigurationController extends Controller
                     ];
                 }
 
-                if(isset($request->type_plan_id) && (($request->type_plan_id != $user->company->type_plan_id) || (isset($request->renew_plan) && $request->renew_plan == TRUE)))
+                if (isset($request->type_plan_id) && (($request->type_plan_id != $user->company->type_plan_id) || (isset($request->renew_plan) && $request->renew_plan == TRUE)))
                     $start_plan_date = Carbon::now()->format('Y-m-d H:i');
                 else
-                    if($request->start_plan_date)
-                        $start_plan_date = $request->start_plan_date;
-                    else
-                        $start_plan_date = $user->company->start_plan_date;
+                    if ($request->start_plan_date)
+                    $start_plan_date = $request->start_plan_date;
+                else
+                    $start_plan_date = $user->company->start_plan_date;
 
-                if(isset($request->type_plan2_id) && (($request->type_plan2_id != $user->company->type_plan2_id) || (isset($request->renew_plan2) && $request->renew_plan2 == TRUE)))
+                if (isset($request->type_plan2_id) && (($request->type_plan2_id != $user->company->type_plan2_id) || (isset($request->renew_plan2) && $request->renew_plan2 == TRUE)))
                     $start_plan_date2 = Carbon::now()->format('Y-m-d H:i');
                 else
-                    if($request->start_plan_date2)
-                        $start_plan_date2 = $request->start_plan_date2;
-                    else
-                        $start_plan_date2 = $user->company->start_plan_date2;
+                    if ($request->start_plan_date2)
+                    $start_plan_date2 = $request->start_plan_date2;
+                else
+                    $start_plan_date2 = $user->company->start_plan_date2;
 
-                if(isset($request->type_plan3_id) && (($request->type_plan3_id != $user->company->type_plan3_id) || (isset($request->renew_plan3) && $request->renew_plan3 == TRUE)))
+                if (isset($request->type_plan3_id) && (($request->type_plan3_id != $user->company->type_plan3_id) || (isset($request->renew_plan3) && $request->renew_plan3 == TRUE)))
                     $start_plan_date3 = Carbon::now()->format('Y-m-d H:i');
                 else
-                    if($request->start_plan_date3)
-                        $start_plan_date3 = $request->start_plan_date3;
-                    else
-                        $start_plan_date3 = $user->company->start_plan_date3;
+                    if ($request->start_plan_date3)
+                    $start_plan_date3 = $request->start_plan_date3;
+                else
+                    $start_plan_date3 = $user->company->start_plan_date3;
 
-                if(isset($request->type_plan4_id) && (($request->type_plan4_id != $user->company->type_plan4_id) || (isset($request->renew_plan4) && $request->renew_plan4 == TRUE)))
+                if (isset($request->type_plan4_id) && (($request->type_plan4_id != $user->company->type_plan4_id) || (isset($request->renew_plan4) && $request->renew_plan4 == TRUE)))
                     $start_plan_date4 = Carbon::now()->format('Y-m-d H:i');
                 else
-                    if($request->start_plan_date4)
-                        $start_plan_date4 = $request->start_plan_date4;
-                    else
-                        $start_plan_date4 = $user->company->start_plan_date4;
+                    if ($request->start_plan_date4)
+                    $start_plan_date4 = $request->start_plan_date4;
+                else
+                    $start_plan_date4 = $user->company->start_plan_date4;
 
-                if(isset($request->absolut_plan_documents) && (($request->absolut_plan_documents != $user->company->absolut_plan_documents) || (isset($request->renew_absolut_plan) && $request->renew_absolut_plan == TRUE)))
+                if (isset($request->absolut_plan_documents) && (($request->absolut_plan_documents != $user->company->absolut_plan_documents) || (isset($request->renew_absolut_plan) && $request->renew_absolut_plan == TRUE)))
                     $absolut_start_plan_date = Carbon::now()->format('Y-m-d H:i');
                 else
-                    if($request->absolut_start_plan_date)
-                        $absolut_start_plan_date = $request->absolut_start_plan_date;
-                    else
-                        $absolut_start_plan_date = $user->company->absolut_start_plan_date;
+                    if ($request->absolut_start_plan_date)
+                    $absolut_start_plan_date = $request->absolut_start_plan_date;
+                else
+                    $absolut_start_plan_date = $user->company->absolut_start_plan_date;
 
                 $user->update([
                     'name' => $request->business_name,
@@ -268,8 +282,8 @@ class ConfigurationController extends Controller
                     'dv' => $dv,
                     'language_id' => $request->language_id ?? 79,
                     'tax_id' => $request->tax_id ?? 1,
-//                    'type_environment_id' => $request->type_environment_id ?? 2,
-//                    'payroll_type_environment_id' => $request->payroll_type_environment_id ?? 2,
+                    //                    'type_environment_id' => $request->type_environment_id ?? 2,
+                    //                    'payroll_type_environment_id' => $request->payroll_type_environment_id ?? 2,
                     'type_operation_id' => $request->type_operation_id ?? 10,
                     'type_document_identification_id' => $request->type_document_identification_id,
                     'country_id' => $request->country_id ?? 46,
@@ -327,9 +341,9 @@ class ConfigurationController extends Controller
         DB::beginTransaction();
 
         try {
-//            auth()->user()->company->software()->delete();
+            //            auth()->user()->company->software()->delete();
             $s = auth()->user()->company->software;
-            if(is_null(auth()->user()->company->software))
+            if (is_null(auth()->user()->company->software))
                 $software = auth()->user()->company->software()->create(
                     [
                         'identifier' => isset($request->id) ? $request->id : '',
@@ -338,9 +352,9 @@ class ConfigurationController extends Controller
                         'url_payroll' => isset($request->urlpayroll) ? $request->urlpayroll : 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
                         'identifier_payroll' => isset($request->idpayroll) ? $request->idpayroll : '',
                         'pin_payroll' => isset($request->pinpayroll) ? $request->pinpayroll : '',
-//                        'url_sd' => $request->urlsd ?? 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
-//                        'identifier_sd' => $request->idsd ?? '',
-//                        'pin_sd' => $request->pinsd ?? '',
+                        //                        'url_sd' => $request->urlsd ?? 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
+                        //                        'identifier_sd' => $request->idsd ?? '',
+                        //                        'pin_sd' => $request->pinsd ?? '',
                         'url_eqdocs' => isset($request->urleqdocs) ? $request->urleqdocs : 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
                         'identifier_eqdocs' => isset($request->ideqdocs) ? $request->ideqdocs : '',
                         'pin_eqdocs' => isset($request->pineqdocs) ? $request->pineqdocs : '',
@@ -355,9 +369,9 @@ class ConfigurationController extends Controller
                         'url_payroll' => isset($request->urlpayroll) ? $request->urlpayroll : 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
                         'identifier_payroll' => isset($request->idpayroll) ? $request->idpayroll : $s->identifier_payroll,
                         'pin_payroll' => isset($request->pinpayroll) ? $request->pinpayroll : $s->pin_payroll,
-//                        'url_sd' => $request->urlsd ?? 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
-//                        'identifier_sd' => $request->idsd ?? $s->identifier_sd,
-//                        'pin_sd' => $request->pinsd ?? $s->pin_sd,
+                        //                        'url_sd' => $request->urlsd ?? 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
+                        //                        'identifier_sd' => $request->idsd ?? $s->identifier_sd,
+                        //                        'pin_sd' => $request->pinsd ?? $s->pin_sd,
                         'url_eqdocs' => isset($request->urleqdocs) ? $request->urleqdocs : $s->url_eqdocs,
                         'identifier_eqdocs' => isset($request->ideqdocs) ? $request->ideqdocs : $s->identifier_eqdocs,
                         'pin_eqdocs' => isset($request->pineqdocs) ? $request->pineqdocs :  $s->pin_eqdocs,
@@ -390,16 +404,15 @@ class ConfigurationController extends Controller
      */
     public function CertificateEndDate($user = FALSE)
     {
-        if($user === FALSE)
+        if ($user === FALSE)
             $company = auth()->user()->company;
         else
             $company = $user->company;
-        $pfxContent = file_get_contents(storage_path("app/certificates/".$company->certificate->name));
+        $pfxContent = file_get_contents(storage_path("app/certificates/" . $company->certificate->name));
         try {
             if (!openssl_pkcs12_read($pfxContent, $x509certdata, $company->certificate->password)) {
                 throw new Exception('The certificate could not be read.');
-            }
-            else{
+            } else {
                 $CertPriv   = array();
                 $CertPriv   = openssl_x509_parse(openssl_x509_read($x509certdata['cert']));
 
@@ -410,18 +423,18 @@ class ConfigurationController extends Controller
 
                 $PublicKey  = $keyData['key'];
 
-//                return $CertPriv['name'];                           //Nome
-//                return $CertPriv['hash'];                           //hash
-//                return $CertPriv['subject']['C'];                   //País
-//                return $CertPriv['subject']['ST'];                  //Estado
-//                return $CertPriv['subject']['L'];                   //Município
-//                return $CertPriv['subject']['CN'];                  //Razão Social e CNPJ / CPF
-                return date('d/m/Y', $CertPriv['validTo_time_t'] ); //Validade
-//                return $CertPriv['extensions']['subjectAltName'];   //Emails Cadastrados separado por ,
-//                return $CertPriv['extensions']['authorityKeyIdentifier'];
-//                return $CertPriv['issuer'];                   //Emissor
-//                return $PublicKey;
-//                return $PrivateKey;
+                //                return $CertPriv['name'];                           //Nome
+                //                return $CertPriv['hash'];                           //hash
+                //                return $CertPriv['subject']['C'];                   //País
+                //                return $CertPriv['subject']['ST'];                  //Estado
+                //                return $CertPriv['subject']['L'];                   //Município
+                //                return $CertPriv['subject']['CN'];                  //Razão Social e CNPJ / CPF
+                return date('d/m/Y', $CertPriv['validTo_time_t']); //Validade
+                //                return $CertPriv['extensions']['subjectAltName'];   //Emails Cadastrados separado por ,
+                //                return $CertPriv['extensions']['authorityKeyIdentifier'];
+                //                return $CertPriv['issuer'];                   //Emissor
+                //                return $PublicKey;
+                //                return $PrivateKey;
             }
         } catch (Exception $e) {
             if (false == ($error = openssl_error_string())) {
@@ -436,24 +449,24 @@ class ConfigurationController extends Controller
         }
     }
 
-    public function certificates_listing($company_identification_number = FALSE){
+    public function certificates_listing($company_identification_number = FALSE)
+    {
         $user = auth()->user();
         $company = $user->company;
 
         $administrator = Administrator::where('identification_number', $company->identification_number)->get();
-        if(count($administrator) > 0){
-            if($company_identification_number)
-                $certificates = Certificate::where('name', '=', $company_identification_number.$this->validarDigVerifDIAN($company_identification_number).'.p12')->get();
+        if (count($administrator) > 0) {
+            if ($company_identification_number)
+                $certificates = Certificate::where('name', '=', $company_identification_number . $this->validarDigVerifDIAN($company_identification_number) . '.p12')->get();
             else
                 $certificates = Certificate::where('id', '>', 0)->get();
 
-            return[
+            return [
                 'success' => true,
                 'certificates' => $certificates,
             ];
-        }
-        else
-            return[
+        } else
+            return [
                 'success' => false,
                 'message' => 'No se pudo ejecutar la peticion, no pertenece al grupo de ADMINISTRADORES...',
             ];
@@ -504,11 +517,10 @@ class ConfigurationController extends Controller
 
             Storage::put("certificates/{$name}", $certificateBinary);
 
-            $pfxContent = file_get_contents(storage_path("app/certificates/".$name));
+            $pfxContent = file_get_contents(storage_path("app/certificates/" . $name));
             if (!openssl_pkcs12_read($pfxContent, $x509certdata, $request->password)) {
                 throw new Exception('The certificate could not be read.');
-            }
-            else{
+            } else {
                 $CertPriv   = array();
                 $CertPriv   = openssl_x509_parse(openssl_x509_read($x509certdata['cert']));
                 $PrivateKey = $x509certdata['pkey'];
@@ -602,10 +614,10 @@ class ConfigurationController extends Controller
         DB::beginTransaction();
 
         try {
-            if($request->delete_all_type_resolutions){
+            if ($request->delete_all_type_resolutions) {
                 $resolution = auth()->user()->company->resolutions()->where('type_document_id', $request->type_document_id)->get();
-                if(count($resolution) > 0)
-                    foreach($resolution as $r)
+                if (count($resolution) > 0)
+                    foreach ($resolution as $r)
                         $r->delete();
             }
             $resolution = auth()->user()->company->resolutions()->updateOrCreate([
@@ -647,14 +659,13 @@ class ConfigurationController extends Controller
      */
     public function RegCustomer(CustomerRequest $request)
     {
-        try{
+        try {
             $r = $this->registerCustomer($request, $request->sendnotification, true);
             return [
                 'success' => true,
                 'message' => 'Cliente creado/actualizado con exito.',
             ];
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return [
                 'message' => 'Internal Server Error',
                 'payload' => $e->getMessage(),
@@ -674,32 +685,34 @@ class ConfigurationController extends Controller
         DB::beginTransaction();
 
         try {
-            $initialdocument = Document::updateOrCreate([
-                'identification_number' => $request->identification_number,
-                'type_document_id' => $request->type_document_id,
-                'prefix' => $request->prefix,
-                'cufe' => 'cufe-initial-number',
-            ],
-            [
-                'number' => $request->number,
-                'state_document_id' => 1,
-                'customer' => '222222222222',
-                'xml' => 'INITIAL_NUMBER.XML',
-                'client_id' => '222222222222',
-                'client' => json_encode([]),
-                'currency_id' => 35,
-                'sale' => 0,
-                'total_discount' => 0,
-                'taxes' => json_encode([]),
-                'total_tax' => 0,
-                'subtotal' => 0,
-                'total' => 0,
-                'version_ubl_id' => 2,
-                'ambient_id' => 2,
-                'request_api' => json_encode([]),
-                'pdf' => 'INITIAL_NUMBER.PDF',
-                'date_issue' => date("Y-m-d H:i:s"),
-            ]);
+            $initialdocument = Document::updateOrCreate(
+                [
+                    'identification_number' => $request->identification_number,
+                    'type_document_id' => $request->type_document_id,
+                    'prefix' => $request->prefix,
+                    'cufe' => 'cufe-initial-number',
+                ],
+                [
+                    'number' => $request->number,
+                    'state_document_id' => 1,
+                    'customer' => '222222222222',
+                    'xml' => 'INITIAL_NUMBER.XML',
+                    'client_id' => '222222222222',
+                    'client' => json_encode([]),
+                    'currency_id' => 35,
+                    'sale' => 0,
+                    'total_discount' => 0,
+                    'taxes' => json_encode([]),
+                    'total_tax' => 0,
+                    'subtotal' => 0,
+                    'total' => 0,
+                    'version_ubl_id' => 2,
+                    'ambient_id' => 2,
+                    'request_api' => json_encode([]),
+                    'pdf' => 'INITIAL_NUMBER.PDF',
+                    'date_issue' => date("Y-m-d H:i:s"),
+                ]
+            );
 
             $initialdocument->save();
 
@@ -729,11 +742,11 @@ class ConfigurationController extends Controller
      */
     public function storeEnvironment(ConfigurationEnvironmentRequest $request)
     {
-        if(!$request->type_environment_id)
+        if (!$request->type_environment_id)
             $request->type_environment_id = auth()->user()->company->type_environment_id;
-        if(!$request->payroll_type_environment_id)
+        if (!$request->payroll_type_environment_id)
             $request->payroll_type_environment_id = auth()->user()->company->payroll_type_environment_id;
-        if(!$request->eqdocs_type_environment_id)
+        if (!$request->eqdocs_type_environment_id)
             $request->eqdocs_type_environment_id = auth()->user()->company->eqdocs_type_environment_id;
         auth()->user()->company->update([
             'type_environment_id' => $request->type_environment_id,
@@ -743,33 +756,33 @@ class ConfigurationController extends Controller
 
         if ($request->type_environment_id)
             if ($request->type_environment_id == 1)
-              auth()->user()->company->software->update([
-                  'url' => 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc',
+                auth()->user()->company->software->update([
+                    'url' => 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc',
                 ]);
             else
-               auth()->user()->company->software->update([
-                  'url' => 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
-              ]);
+                auth()->user()->company->software->update([
+                    'url' => 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
+                ]);
 
         if ($request->payroll_type_environment_id)
             if ($request->payroll_type_environment_id == 1)
-              auth()->user()->company->software->update([
-                  'url_payroll' => 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc',
+                auth()->user()->company->software->update([
+                    'url_payroll' => 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc',
                 ]);
             else
-               auth()->user()->company->software->update([
-                  'url_payroll' => 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
-              ]);
+                auth()->user()->company->software->update([
+                    'url_payroll' => 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
+                ]);
 
         if ($request->eqdocs_type_environment_id)
             if ($request->eqdocs_type_environment_id == 1)
-              auth()->user()->company->software->update([
-                  'url_eqdocs' => 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc',
+                auth()->user()->company->software->update([
+                    'url_eqdocs' => 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc',
                 ]);
             else
-               auth()->user()->company->software->update([
-                  'url_eqdocs' => 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
-              ]);
+                auth()->user()->company->software->update([
+                    'url_eqdocs' => 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc',
+                ]);
 
         return [
             'message' => 'Ambiente actualizado con éxito',
@@ -778,8 +791,8 @@ class ConfigurationController extends Controller
     }
 
     /**
-    * Borrar Company API
-    */
+     * Borrar Company API
+     */
     public function deleteCompany($nit, $dv)
     {
         $company = Company::where('identification_number', '=', $nit)->get()->first();
@@ -795,8 +808,8 @@ class ConfigurationController extends Controller
     }
 
     /**
-    * Destroy Company used by FACTURADOR PRO
-    */
+     * Destroy Company used by FACTURADOR PRO
+     */
     public function destroyCompany($nit, $email)
     {
         $id_user = User::select('id')->where('email', $email)->first();
@@ -817,7 +830,7 @@ class ConfigurationController extends Controller
     {
         try {
             $a = TypePlan::where('id', $request->id)->get();
-            if(count($a) > 0)
+            if (count($a) > 0)
                 $plan = TypePlan::updateOrCreate([
                     'id' => $request->id,
                 ], [
@@ -830,7 +843,7 @@ class ConfigurationController extends Controller
                     'state' => $request->state ?? true,
                     'observations' => $request->observations,
                 ]);
-            else{
+            else {
                 $plan = TypePlan::updateOrCreate([
                     'id' => $request->id,
                 ], [
@@ -868,13 +881,13 @@ class ConfigurationController extends Controller
     public function storeAdministrator(AdministratorRequest $request)
     {
         try {
-            if($request->password)
+            if ($request->password)
                 $password = $request->password;
             else
                 $password = "12345*";
 
             $a = Administrator::where('identification_number', $request->identification_number)->get();
-            if(count($a) > 0)
+            if (count($a) > 0)
                 $administrator = Administrator::updateOrCreate([
                     'identification_number' => $request->identification_number,
                 ], [
@@ -888,7 +901,7 @@ class ConfigurationController extends Controller
                     'state' => $request->state ?? true,
                     'observation' => $request->observation,
                 ]);
-            else{
+            else {
                 $administrator = Administrator::updateOrCreate([
                     'identification_number' => $request->identification_number,
                 ], [
@@ -928,7 +941,7 @@ class ConfigurationController extends Controller
     public function queryPlan($id = FALSE)
     {
         try {
-            if($id)
+            if ($id)
                 $a = TypePlan::where('id', $id)->firstOrFail();
             else
                 $a = TypePlan::where('id', '>', 0)->get();
@@ -955,7 +968,7 @@ class ConfigurationController extends Controller
     public function queryAdministrator($nit = FALSE)
     {
         try {
-            if($nit)
+            if ($nit)
                 $a = Administrator::where('identification_number', $nit)->firstOrFail();
             else
                 $a = Administrator::where('identification_number', '>', 0)->get();
@@ -986,7 +999,7 @@ class ConfigurationController extends Controller
             $u = User::where('id_administrator', $a->id)->get();
             return [
                 'success' => true,
-                'message' => 'Usuarios registrados al administrador NIT: '.$nit,
+                'message' => 'Usuarios registrados al administrador NIT: ' . $nit,
                 'user' => $u,
             ];
         } catch (Exception $e) {
@@ -1011,7 +1024,7 @@ class ConfigurationController extends Controller
             $u = Company::where('type_plan_id', $a->id)->get();
             return [
                 'success' => true,
-                'message' => 'Usuarios registrados al plan ID: '.$id,
+                'message' => 'Usuarios registrados al plan ID: ' . $id,
                 'user' => $u,
             ];
         } catch (Exception $e) {
@@ -1032,91 +1045,79 @@ class ConfigurationController extends Controller
     {
         $user = auth()->user();
         $company = $user->company;
-        if($user->company->type_plan->period == 0){
-          $period = "SIN LIMITES - NO PLAN";
-          $renovation_date = NULL;
+        if ($user->company->type_plan->period == 0) {
+            $period = "SIN LIMITES - NO PLAN";
+            $renovation_date = NULL;
+        } else
+            if ($user->company->type_plan->period == 1) {
+            $period = "MENSUAL";
+            $renovation_date = date("Y-m-d H:i:s", strtotime($company->start_plan_date . "+ 1 month"));
+        } else
+                if ($user->company->type_plan->period == 2) {
+            $period = "ANUAL";
+            $renovation_date = date("Y-m-d H:i:s", strtotime($company->start_plan_date . "+ 1 year"));
+        } else
+                    if ($user->company->type_plan->period == 3) {
+            $period = "PAQUETE";
+            $renovation_date = NULL;
         }
-        else
-            if($user->company->type_plan->period == 1){
-              $period = "MENSUAL";
-              $renovation_date = date("Y-m-d H:i:s", strtotime($company->start_plan_date."+ 1 month"));
-            }
-            else
-                if($user->company->type_plan->period == 2){
-                  $period = "ANUAL";
-                  $renovation_date = date("Y-m-d H:i:s", strtotime($company->start_plan_date."+ 1 year"));
-                }
-                else
-                    if($user->company->type_plan->period == 3){
-                        $period = "PAQUETE";
-                        $renovation_date = NULL;
-                    }
 
-        if($user->company->type_plan2->period == 0){
-          $period2 = "SIN LIMITES - NO PLAN";
-          $renovation_date2 = NULL;
+        if ($user->company->type_plan2->period == 0) {
+            $period2 = "SIN LIMITES - NO PLAN";
+            $renovation_date2 = NULL;
+        } else
+            if ($user->company->type_plan2->period == 1) {
+            $period2 = "MENSUAL";
+            $renovation_date2 = date("Y-m-d H:i:s", strtotime($company->start_plan_date2 . "+ 1 month"));
+        } else
+                if ($user->company->type_plan2->period == 2) {
+            $period2 = "ANUAL";
+            $renovation_date2 = date("Y-m-d H:i:s", strtotime($company->start_plan_date2 . "+ 1 year"));
+        } else
+                    if ($user->company->type_plan2->period == 3) {
+            $period2 = "PAQUETE";
+            $renovation_date2 = NULL;
         }
-        else
-            if($user->company->type_plan2->period == 1){
-              $period2 = "MENSUAL";
-              $renovation_date2 = date("Y-m-d H:i:s", strtotime($company->start_plan_date2."+ 1 month"));
-            }
-            else
-                if($user->company->type_plan2->period == 2){
-                  $period2 = "ANUAL";
-                  $renovation_date2 = date("Y-m-d H:i:s", strtotime($company->start_plan_date2."+ 1 year"));
-                }
-                else
-                    if($user->company->type_plan2->period == 3){
-                        $period2 = "PAQUETE";
-                        $renovation_date2 = NULL;
-                    }
 
-        if($user->company->type_plan3->period == 0){
-          $period3 = "SIN LIMITES - NO PLAN";
-          $renovation_date3 = NULL;
+        if ($user->company->type_plan3->period == 0) {
+            $period3 = "SIN LIMITES - NO PLAN";
+            $renovation_date3 = NULL;
+        } else
+            if ($user->company->type_plan3->period == 1) {
+            $period3 = "MENSUAL";
+            $renovation_date3 = date("Y-m-d H:i:s", strtotime($company->start_plan_date3 . "+ 1 month"));
+        } else
+                if ($user->company->type_plan3->period == 2) {
+            $period3 = "ANUAL";
+            $renovation_date3 = date("Y-m-d H:i:s", strtotime($company->start_plan_date3 . "+ 1 year"));
+        } else
+                    if ($user->company->type_plan3->period == 3) {
+            $period3 = "PAQUETE";
+            $renovation_date3 = NULL;
         }
-        else
-            if($user->company->type_plan3->period == 1){
-              $period3 = "MENSUAL";
-              $renovation_date3 = date("Y-m-d H:i:s", strtotime($company->start_plan_date3."+ 1 month"));
-            }
-            else
-                if($user->company->type_plan3->period == 2){
-                  $period3 = "ANUAL";
-                  $renovation_date3 = date("Y-m-d H:i:s", strtotime($company->start_plan_date3."+ 1 year"));
-                }
-                else
-                    if($user->company->type_plan3->period == 3){
-                        $period3 = "PAQUETE";
-                        $renovation_date3 = NULL;
-                    }
 
-        if($user->company->type_plan4->period == 0){
-          $period4 = "SIN LIMITES - NO PLAN";
-          $renovation_date4 = NULL;
+        if ($user->company->type_plan4->period == 0) {
+            $period4 = "SIN LIMITES - NO PLAN";
+            $renovation_date4 = NULL;
+        } else
+            if ($user->company->type_plan4->period == 1) {
+            $period4 = "MENSUAL";
+            $renovation_date4 = date("Y-m-d H:i:s", strtotime($company->start_plan_date4 . "+ 1 month"));
+        } else
+                if ($user->company->type_plan4->period == 2) {
+            $period4 = "ANUAL";
+            $renovation_date4 = date("Y-m-d H:i:s", strtotime($company->start_plan_date4 . "+ 1 year"));
+        } else
+                    if ($user->company->type_plan4->period == 3) {
+            $period4 = "PAQUETE";
+            $renovation_date4 = NULL;
         }
-        else
-            if($user->company->type_plan4->period == 1){
-              $period4 = "MENSUAL";
-              $renovation_date4 = date("Y-m-d H:i:s", strtotime($company->start_plan_date4."+ 1 month"));
-            }
-            else
-                if($user->company->type_plan4->period == 2){
-                  $period4 = "ANUAL";
-                  $renovation_date4 = date("Y-m-d H:i:s", strtotime($company->start_plan_date4."+ 1 year"));
-                }
-                else
-                    if($user->company->type_plan4->period == 3){
-                        $period4 = "PAQUETE";
-                        $renovation_date4 = NULL;
-                    }
 
         try {
-            if($user->company->absolut_plan_documents == 0)
+            if ($user->company->absolut_plan_documents == 0)
                 return [
                     'success' => true,
-                    'message' => 'Informacion del plan vigente para el usuario: '.$company->identification_number,
+                    'message' => 'Informacion del plan vigente para el usuario: ' . $company->identification_number,
                     'plan' => $company->type_plan,
                     'period' => $period,
                     'start_plan_date' => $company->start_plan_date,
@@ -1141,7 +1142,7 @@ class ConfigurationController extends Controller
             else
                 return [
                     'success' => true,
-                    'message' => 'Informacion del plan vigente para el usuario: '.$company->identification_number,
+                    'message' => 'Informacion del plan vigente para el usuario: ' . $company->identification_number,
                     'absolut_plan' => "PLAN MIXTO",
                     'absolut_start_plan_date' => $company->absolut_start_plan_date,
                     'absolut_plan_documents' => $company->absolut_plan_documents,

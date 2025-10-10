@@ -33,6 +33,8 @@ while (true) {
             $jsObj->mail_username = "info@superlosmontes.com";
             $jsObj->mail_password = "x7gX4VIhm0w2/";
             $jsObj->mail_encryption = "tls";
+            $jsObj->fnote_pdf = "A partir del 01/01/2020 pertenecemos al régimen especial ZESE. No retener en ICA, somos Autorretenedores en los municipios de Cúcuta, Los Patios y Villa del Rosario, del Norte de Santander.";
+            $jsObj->email_pdf = "contador@superlosmontes.co";
             $url = "http://localhost/apidian/public/api/ubl2.1/config/900603041/5";
             $request = "POST";
             break;
