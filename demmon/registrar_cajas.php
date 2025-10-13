@@ -35,7 +35,7 @@ if (count($datos) == 0) {
         $jsObj->type_document_id = 4;
         $jsObj->from = $row['FromNumber'];
         $jsObj->to = $row['ToNumber'];
-        $jsObj->prefix = $row['Prefix'];
+        $jsObj->prefix = $prenc;
         $jsObj->resolution = $row['ResolutionNumber'];
         envJson2Api($jsObj);
         echo str_repeat('=', 30), "\r\n";
@@ -47,18 +47,18 @@ function envJson2Api($jsObj)
 {
     $curl = curl_init();
     curl_setopt_array($curl, [
-        CURLOPT_URL => 'http://localhost/apidian/public/api/ubl2.1/config/resolution',
+        CURLOPT_URL => "http://localhost/apidian/public/api/ubl2.1/config/resolution",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
         CURLOPT_TIMEOUT => 30,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_CUSTOMREQUEST => "PUT",
         CURLOPT_POSTFIELDS => json_encode($jsObj),
         CURLOPT_HTTPHEADER => [
-            "Accept: application/json",
             "Authorization: Bearer 04cde66691dad4b7aea1729558a0c6f6a1f281ad687c6c92e7d5e32f7f445c0d",
-            "Content-Type: application/json"
+            "Content-Type: application/json",
+            "accept: application/json"
         ],
     ]);
     $response = curl_exec($curl);
