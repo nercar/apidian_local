@@ -1040,7 +1040,7 @@ class InvoiceController extends Controller
         ];
     }
 
-    public function recreateZipFile(InvoiceRequest $request)
+    public function recreateZipFile(Request $request)
     {
         return $request;
         // User
