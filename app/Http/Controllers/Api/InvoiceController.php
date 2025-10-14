@@ -1167,10 +1167,10 @@ class InvoiceController extends Controller
         //     'healthfields'
         // ));
         // // Signature XML
-        // $signInvoice = new SignInvoice($company->certificate->path, $company->certificate->password);
-        // $signInvoice->softwareID = $company->software->identifier;
-        // $signInvoice->pin = $company->software->pin;
-        // $signInvoice->technicalKey = $resolution->technical_key;
+        $signInvoice = new SignInvoice($company->certificate->path, $company->certificate->password);
+        $signInvoice->softwareID = $company->software->identifier;
+        $signInvoice->pin = $company->software->pin;
+        $signInvoice->technicalKey = $resolution->technical_key;
         // if (!is_dir(storage_path("app/public/{$company->identification_number}"))) {
         //     mkdir(storage_path("app/public/{$company->identification_number}"));
         // }
@@ -1265,7 +1265,7 @@ class InvoiceController extends Controller
             'message' => "{$typeDocument->name} #{$resolution->next_consecutive} generada con éxito",
             'send_email_success' => (null !== $invoice && $request->sendmail == true) ?? $invoice[0]->send_email_success == 1,
             'send_email_date_time' => (null !== $invoice && $request->sendmail == true) ?? Carbon::now()->format('Y-m-d H:i'),
-            'ResponseDian' => $respuestadian,
+            // 'ResponseDian' => $respuestadian,
             'invoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.xml"))),
             'zipinvoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}.zip"))),
             'unsignedinvoicexml' => base64_encode(file_get_contents(storage_path("app/public/{$company->identification_number}/FE-{$resolution->next_consecutive}.xml"))),
@@ -1276,7 +1276,7 @@ class InvoiceController extends Controller
             'urlinvoicepdf' => "FES-{$resolution->next_consecutive}.pdf",
             // 'urlinvoiceattached' => "{$filename}.xml",
             'cufe' => $signInvoice->ConsultarCUFE(),
-            'QRStr' => $QRStr,
+            // 'QRStr' => $QRStr,
             'certificate_days_left' => $certificate_days_left,
             'resolution_days_left' => $this->days_between_dates(Carbon::now()->format('Y-m-d'), $resolution->date_to),
         ];
