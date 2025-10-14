@@ -129,7 +129,6 @@ Route::middleware('auth:api')->group(function () {
             Route::post('/', 'Api\InvoiceController@store');
             Route::get('/current_number/{type}/{prefix?}/{ignore_state_document_id?}', 'Api\InvoiceController@currentNumber');
             Route::get('/state_document/{type}/{number}', 'Api\InvoiceController@changestateDocument');
-            Route::post('/recreateZipFile', 'Api\InvoiceController@recreateZipFile');
         });
 
         // Export Invoice
