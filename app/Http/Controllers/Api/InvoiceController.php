@@ -1139,49 +1139,49 @@ class InvoiceController extends Controller
             $invoiceLines->push(new InvoiceLine($invoiceLine));
         }
         // Create XML
-        $invoice = $this->createXML(compact(
-            'user',
-            'company',
-            'customer',
-            'taxTotals',
-            'withHoldingTaxTotal',
-            'resolution',
-            'paymentForm',
-            'typeDocument',
-            'invoiceLines',
-            'allowanceCharges',
-            'legalMonetaryTotals',
-            'date',
-            'time',
-            'notes',
-            'typeoperation',
-            'orderreference',
-            'prepaidpayment',
-            'prepaidpayments',
-            'delivery',
-            'deliveryparty',
-            'request',
-            'idcurrency',
-            'calculationrate',
-            'calculationratedate',
-            'healthfields'
-        ));
-        // Signature XML
-        $signInvoice = new SignInvoice($company->certificate->path, $company->certificate->password);
-        $signInvoice->softwareID = $company->software->identifier;
-        $signInvoice->pin = $company->software->pin;
-        $signInvoice->technicalKey = $resolution->technical_key;
-        if (!is_dir(storage_path("app/public/{$company->identification_number}"))) {
-            mkdir(storage_path("app/public/{$company->identification_number}"));
-        }
-        $signInvoice->GuardarEn = storage_path("app/public/{$company->identification_number}/FE-{$resolution->next_consecutive}.xml");
-        $sendBillSync = new SendBillSync($company->certificate->path, $company->certificate->password);
-        $sendBillSync->To = $company->software->url;
-        $sendBillSync->fileName = "{$resolution->next_consecutive}.xml";
-        $sendBillSync->contentFile = $this->zipBase64($company, $resolution, $signInvoice->sign($invoice), storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}"));
-        $QRStr = $this->createPDF($user, $company, $customer, $typeDocument, $resolution, $date, $time, $paymentForm, $request, $signInvoice->ConsultarCUFE(), "INVOICE", $withHoldingTaxTotal, $notes, $healthfields);
-        $filename = '';
-        $respuestadian = '';
+        // $invoice = $this->createXML(compact(
+        //     'user',
+        //     'company',
+        //     'customer',
+        //     'taxTotals',
+        //     'withHoldingTaxTotal',
+        //     'resolution',
+        //     'paymentForm',
+        //     'typeDocument',
+        //     'invoiceLines',
+        //     'allowanceCharges',
+        //     'legalMonetaryTotals',
+        //     'date',
+        //     'time',
+        //     'notes',
+        //     'typeoperation',
+        //     'orderreference',
+        //     'prepaidpayment',
+        //     'prepaidpayments',
+        //     'delivery',
+        //     'deliveryparty',
+        //     'request',
+        //     'idcurrency',
+        //     'calculationrate',
+        //     'calculationratedate',
+        //     'healthfields'
+        // ));
+        // // Signature XML
+        // $signInvoice = new SignInvoice($company->certificate->path, $company->certificate->password);
+        // $signInvoice->softwareID = $company->software->identifier;
+        // $signInvoice->pin = $company->software->pin;
+        // $signInvoice->technicalKey = $resolution->technical_key;
+        // if (!is_dir(storage_path("app/public/{$company->identification_number}"))) {
+        //     mkdir(storage_path("app/public/{$company->identification_number}"));
+        // }
+        // $signInvoice->GuardarEn = storage_path("app/public/{$company->identification_number}/FE-{$resolution->next_consecutive}.xml");
+        // $sendBillSync = new SendBillSync($company->certificate->path, $company->certificate->password);
+        // $sendBillSync->To = $company->software->url;
+        // $sendBillSync->fileName = "{$resolution->next_consecutive}.xml";
+        // $sendBillSync->contentFile = $this->zipBase64($company, $resolution, $signInvoice->sign($invoice), storage_path("app/public/{$company->identification_number}/FES-{$resolution->next_consecutive}"));
+        // $QRStr = $this->createPDF($user, $company, $customer, $typeDocument, $resolution, $date, $time, $paymentForm, $request, $signInvoice->ConsultarCUFE(), "INVOICE", $withHoldingTaxTotal, $notes, $healthfields);
+        // $filename = '';
+        // $respuestadian = '';
         // $typeDocument = TypeDocument::findOrFail(7);
         // $ar = new \DOMDocument;
         // try {
