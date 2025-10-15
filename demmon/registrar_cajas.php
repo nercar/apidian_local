@@ -34,7 +34,7 @@ if (count($datos) == 0) {
         $jsObj = new stdClass();
         $jsObj->type_document_id = 4;
         $jsObj->from = $row['FromNumber'];
-        $jsObj->to = $row['ToNumber'];
+        $jsObj->to = 99999999;
         $jsObj->prefix = $prenc;
         $jsObj->resolution = $row['ResolutionNumber'];
         envJson2Api($jsObj);
