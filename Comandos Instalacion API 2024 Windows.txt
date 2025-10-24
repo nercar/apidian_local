@@ -17,7 +17,7 @@ git config --global http.sslverify false
 #git clone https://gitlab.buho.la/facturalatam/co-apidian2024.git apidian
 git clone https://github.com/nercar/apidian_local.git apidian
 cd apidian
-cp .env.example .env
+cp demmon/env.txt .env
 rm composer.lock
 composer install
 php artisan config:cache && php artisan cache:clear
