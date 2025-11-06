@@ -24,10 +24,10 @@ if ($argc >= 1) {
             DEFINE("SYS_PASS__SQL", "");
             /* CONEXION CON MYSQL */
             DEFINE("SYS_ENGINEMYSQL", "mysql");
-            DEFINE("SYS_HOSTMYSQL", "localhost");
+            DEFINE("SYS_HOSTMYSQL", $ipserv);
             DEFINE("SYS_BBDDMYSQL", "apidian");
             DEFINE("SYS_USERMYSQL", "apidian");
-            DEFINE("SYS_PASSMYSQL", "ApiDIAN2024@@");
+            DEFINE("SYS_PASSMYSQL", "apidian");
             DEFINE("SYS_PORTMYSQL", "3306");
             class CxSQLSUCURSAL
             {
@@ -71,13 +71,11 @@ if ($argc >= 1) {
                     }
                     exit;
                 }
-                $sql = "SELECT TOP 100 PERCENT id, prefijo, folio, cufe, CONVERT(VARCHAR(16), created_at, 121) AS fecha
-                    FROM BDES_POS.dbo.factura_electronica
-                    WHERE CAST(created_at AS date) >= CAST('2025-10-01' AS date)
-                        -- CAST(created_at AS DATE) >= CAST(GETDATE() - 1 AS DATE)
-                        AND DATEADD(MINUTE, -10, created_at) < CURRENT_TIMESTAMP
-                        AND (cufe_verificado < 2 OR COALESCE(cufe, '') = '')
-                    ORDER BY created_at DESC";
+                $sql = "SELECT TOP 100 PERCENT id, prefijo, folio, cufe, CONVERT(VARCHAR(16), created_at, 121) AS fecha, cufe_verificado
+                        FROM BDES_POS.dbo.factura_electronica
+                        WHERE --created_at >= '2025-04-01T00:00:00' AND (cufe_verificado < 2 OR COALESCE(cufe, '') = '')
+                            prefijo = 'F132' AND folio = 26708
+                        ORDER BY created_at ASC";
                 $pend = sqlsrv_query($conSQLLoc, $sql);
                 if ($pend === false) {
                     $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
@@ -86,7 +84,9 @@ if ($argc >= 1) {
                     }
                 } else {
                     while ($row = sqlsrv_fetch_array($pend, SQLSRV_FETCH_ASSOC)) {
+                        echo 'Procesando ', $row['fecha'], '-', $row['prefijo'], '-', $row['folio'], ' ';
                         if (preg_replace("/[^0-9]/", "", $row['folio']) != $row['folio']) {
+                            echo 'Cufe Verificado = 3 ';
                             $sql = "UPDATE dbo.factura_electronica SET cufe_verificado = 3 WHERE id = " . $row['id'];
                             $res = sqlsrv_query($conSQLLoc, $sql);
                             if ($res == false) {
@@ -98,6 +98,7 @@ if ($argc >= 1) {
                                 exit;
                             }
                         } else if (valCufeDian($row['cufe'], $row['prefijo'], $row['folio'])) {
+                            echo 'Cufe Verificado = 2 ';
                             $sql = "UPDATE dbo.factura_electronica SET cufe_verificado = 2 WHERE id = " . $row['id'];
                             $res = sqlsrv_query($conSQLLoc, $sql);
                             if ($res == false) {
@@ -109,9 +110,9 @@ if ($argc >= 1) {
                                 exit;
                             }
                         } else {
+                            echo 'Renviando ';
                             $dir = __DIR__ . DIRECTORY_SEPARATOR;
                             $cmd = "php " . $dir . "renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
-                            // echo $cmd;
                             echo shell_exec($cmd);
                         }
                     }
@@ -132,8 +133,9 @@ if ($argc >= 1) {
 function valCufeDian($cufe, $prefijo, $folio)
 {
     if ($cufe == '') return false;
+    echo 'Validando cufe ', $cufe;
     $curl = curl_init();
-    $url  = "http://localhost/apidian/public/api/ubl2.1/xml/document/$cufe";
+    $url  = "http://" . SYS_HOSTMYSQL . "/apidian/public/api/ubl2.1/xml/document/$cufe";
     curl_setopt_array($curl, [
         CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
@@ -151,9 +153,9 @@ function valCufeDian($cufe, $prefijo, $folio)
     $response = curl_exec($curl);
     $err = curl_error($curl);
     curl_close($curl);
-    $valido = false;
     if ($err) {
-        echo __LINE__, " cURL Error #: " . $err;
+        echo __LINE__, " cURL Error #: " . $err, "\r\n";
+        return false;
     } else {
         $response = json_decode($response);
         $xmlqrc = base64_decode($response->ResponseDian->Envelope->Body->GetXmlByDocumentKeyResponse->GetXmlByDocumentKeyResult->XmlBytesBase64);
@@ -169,10 +171,7 @@ function valCufeDian($cufe, $prefijo, $folio)
         $fin = strpos($qrcode, 'FecFac: ') - 1;
         $len = $fin - $ini;
         $qrcode = substr($qrcode, $ini, $len);
-        if ($qrcode != ($prefijo . $folio)) {
-            return false;
-        }
-        return $response->success;
+        if ($qrcode != ($prefijo . $folio)) return false;
+        else return $response->success;
     }
-    return $valido;
 }

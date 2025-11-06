@@ -32,10 +32,10 @@ if ($argc >= 1) {
             DEFINE("SYS_PASS__SQL", "");
             /* CONEXION CON MYSQL */
             DEFINE("SYS_ENGINEMYSQL", "mysql");
-            DEFINE("SYS_HOSTMYSQL", "localhost");
+            DEFINE("SYS_HOSTMYSQL", $ipserv);
             DEFINE("SYS_BBDDMYSQL", "apidian");
             DEFINE("SYS_USERMYSQL", "apidian");
-            DEFINE("SYS_PASSMYSQL", "ApiDIAN2024@@");
+            DEFINE("SYS_PASSMYSQL", "apidian");
             DEFINE("SYS_PORTMYSQL", "3306");
             class CxSQLSUCURSAL
             {
@@ -108,8 +108,8 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 $jsObj->invoice_period->start_date = date('Y-m-01', strtotime($row['br_issue_date']));
                 $jsObj->invoice_period->end_date = date('Y-m-t', strtotime($row['br_issue_date']));
             }
-            $todayDate = date('Y-m-d');
-            $dueDate = date("Y-m-d", strtotime($todayDate . "+ 30 days"));
+            $todayDate = date("Y-m-d", strtotime($row['date']));
+            $dueDate = date("Y-m-d", strtotime($row['date'] . "+ 30 days"));
             $sdf = $todayDate;
             $jsObj->date = $sdf;
             $jsObj->time = $row['time'];
@@ -333,7 +333,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
 function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number)
 {
     $curl = curl_init();
-    $url  = "http://localhost/apidian/public/api/ubl2.1/";
+    $url  = "http://" . SYS_HOSTMYSQL . "/apidian/public/api/ubl2.1/";
     $url .= ($type_document_id == 1) ? 'invoice' : 'credit-note';
     echo " Enviando [$prefix-$number] -> ";
     curl_setopt_array($curl, [
@@ -405,7 +405,7 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
             $cnx->query("UPDATE documents SET state_document_id = 1, cufe = '$cufe', updated_at = CURRENT_TIMESTAMP
                         WHERE prefix = '$prefix' AND number = '$number' AND id = $idfac");
             if ($identification_number != "222222222222") {
-                $url  = "http://localhost/apidian/public/api/ubl2.1/send-email";
+                $url  = "http://" . SYS_HOSTMYSQL . "/apidian/public/api/ubl2.1/send-email";
                 echo " Mail [$prefix-$number] -> ";
                 $jsObj = array(
                     "prefix" => "$prefix",
@@ -433,9 +433,7 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
                 $response = curl_exec($curl);
                 $err = curl_error($curl);
                 curl_close($curl);
-                if ($err) {
-                    echo "cURL Error #:" . $err;
-                }
+                if ($err) echo "cURL Error #:" . $err, "\r\n";
             }
             echo $cufe;
         } else {
@@ -462,15 +460,11 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
 
 function digitoVer($nitParam)
 {
-    if ($nitParam == null || trim($nitParam) == '') {
-        return -1;
-    }
+    if ($nitParam == null || trim($nitParam) == '') return -1;
     $nitParam = trim($nitParam);
     $indiceRaya = strpos($nitParam, '-');
     $nitInterno = $indiceRaya > 0 ? substr($nitParam, 0, $indiceRaya) : $nitParam;
-    if (!is_numeric($nitInterno)) {
-        return -1;
-    }
+    if (!is_numeric($nitInterno)) return -1;
     $nitVector = str_split($nitInterno);
     $valorCalculado = 0;
     $aux = count($nitVector) - 1;
@@ -524,8 +518,6 @@ function digitoVer($nitParam)
         }
     }
     $modulo = $valorCalculado % 11;
-    if ($modulo >= 2) {
-        $modulo = 11 - $modulo;
-    }
+    if ($modulo >= 2) $modulo = 11 - $modulo;
     return $modulo;
 }
