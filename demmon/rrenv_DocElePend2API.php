@@ -3,11 +3,11 @@ if ($argc >= 1) {
     $demonio = $argv[0];
     $instan = strtolower($argv[1]);
     $ipserv = strtolower($argv[2]);
-    $strrun = trim($demonio . ' ' . $instan . ' ' . $ipserv);
-    $execstring = "ps aux | grep -v grep | grep '$strrun'";
+    $strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
     $output = [];
-    exec($execstring, $output);
-    if (count($output) <= 1) {
+    $retval = null;
+    exec('tasklist /V | findstr /l "' . $strrun . '"', $output, $retval);
+    if (count($output) <= 2) {
         /**
          * Permite obtener los datos de la base de datos y retornarlos
          * en modo json o array

@@ -3,10 +3,10 @@ if ($argc >= 1) {
     $demonio = $argv[0];
     $instan = strtolower($argv[1]);
     $ipserv = strtolower($argv[2]);
-    $strrun = trim($demonio . ' ' . $instan . ' ' . $ipserv);
+    $strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
     $output = [];
     $retval = null;
-    exec('tasklist /V | findstr "' . $demonio . '"', $output, $retval);
+    exec('tasklist /V | findstr /l "' . $strrun . '"', $output, $retval);
     if (count($output) <= 2) {
         /**
          * Permite obtener los datos de la base de datos y retornarlos
@@ -73,8 +73,8 @@ if ($argc >= 1) {
                 }
                 $sql = "SELECT TOP 100 PERCENT id, prefijo, folio, cufe, CONVERT(VARCHAR(16), created_at, 121) AS fecha, cufe_verificado
                         FROM BDES_POS.dbo.factura_electronica
-                        WHERE created_at >= '2025-04-01T00:00:00' AND (cufe_verificado < 2 OR COALESCE(cufe, '') = '')
-                        ORDER BY created_at ASC";
+                        WHERE CAST(created_at AS DATE) >= CAST(GETDATE() AS DATE) AND (cufe_verificado < 2 OR COALESCE(cufe, '') = '')
+                        ORDER BY created_at asc";
                 $pend = sqlsrv_query($conSQLLoc, $sql);
                 if ($pend === false) {
                     $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);

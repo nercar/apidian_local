@@ -1,10 +1,10 @@
 <?php
 $demonio = $argv[0];
-$strrun = trim($demonio);
-$execstring = "ps aux | grep -v grep | grep '$strrun'";
+$strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
 $output = [];
-exec($execstring, $output);
-if (count($output) <= 1) {
+$retval = null;
+exec('tasklist /V | findstr /l "' . $strrun . '"', $output, $retval);
+if (count($output) <= 2) {
     try {
         date_default_timezone_set('America/Bogota');
         /* CONEXION CON MYSQL */
