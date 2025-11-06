@@ -27,7 +27,7 @@ if ($argc >= 1) {
             DEFINE("SYS_HOSTMYSQL", $ipserv);
             DEFINE("SYS_BBDDMYSQL", "apidian");
             DEFINE("SYS_USERMYSQL", "apidian");
-            DEFINE("SYS_PASSMYSQL", "apidian");
+            DEFINE("SYS_PASSMYSQL", "ApiDIAN2024@@");
             DEFINE("SYS_PORTMYSQL", "3306");
             class CxSQLSUCURSAL
             {
