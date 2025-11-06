@@ -132,7 +132,7 @@ if ($argc >= 1) {
 function valCufeDian($cufe, $prefijo, $folio)
 {
     if ($cufe == '') return false;
-    echo 'Validando cufe ', $cufe;
+    echo 'Validando cufe ', $cufe, "\r\n";
     $curl = curl_init();
     $url  = "http://" . SYS_HOSTMYSQL . "/apidian/public/api/ubl2.1/xml/document/$cufe";
     curl_setopt_array($curl, [
