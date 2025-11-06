@@ -96,19 +96,21 @@ if ($argc >= 1) {
                                 }
                                 exit;
                             }
-                        } else if (valCufeDian($row['cufe'], $row['prefijo'], $row['folio'])) {
-                            echo 'Cufe Verificado = 2 ';
-                            $sql = "UPDATE dbo.factura_electronica SET cufe_verificado = 2 WHERE id = " . $row['id'];
-                            $res = sqlsrv_query($conSQLLoc, $sql);
-                            if ($res == false) {
-                                echo __LINE__, 'Error actualizando la columna cufe_verificado en factura electronica', "\r\n";
-                                $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
-                                foreach ($errors as $error) {
-                                    echo "\r\n", 'ERRORsSQLSucursal: ', __LINE__, ' ', $ipserv, ' ', $error['message'], "\r\n", $sql;
-                                }
-                                exit;
-                            }
-                        } else {
+                        }
+                        // else if (valCufeDian($row['cufe'], $row['prefijo'], $row['folio'])) {
+                        //     echo 'Cufe Verificado = 2 ';
+                        //     $sql = "UPDATE dbo.factura_electronica SET cufe_verificado = 2 WHERE id = " . $row['id'];
+                        //     $res = sqlsrv_query($conSQLLoc, $sql);
+                        //     if ($res == false) {
+                        //         echo __LINE__, 'Error actualizando la columna cufe_verificado en factura electronica', "\r\n";
+                        //         $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
+                        //         foreach ($errors as $error) {
+                        //             echo "\r\n", 'ERRORsSQLSucursal: ', __LINE__, ' ', $ipserv, ' ', $error['message'], "\r\n", $sql;
+                        //         }
+                        //         exit;
+                        //     }
+                        // } 
+                        else {
                             echo 'Renviando ';
                             $dir = __DIR__ . DIRECTORY_SEPARATOR;
                             $cmd = "php " . $dir . "renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
