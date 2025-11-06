@@ -73,8 +73,7 @@ if ($argc >= 1) {
                 }
                 $sql = "SELECT TOP 100 PERCENT id, prefijo, folio, cufe, CONVERT(VARCHAR(16), created_at, 121) AS fecha, cufe_verificado
                         FROM BDES_POS.dbo.factura_electronica
-                        WHERE --created_at >= '2025-04-01T00:00:00' AND (cufe_verificado < 2 OR COALESCE(cufe, '') = '')
-                            prefijo = 'F132' AND folio = 26708
+                        WHERE created_at >= '2025-04-01T00:00:00' AND (cufe_verificado < 2 OR COALESCE(cufe, '') = '')
                         ORDER BY created_at ASC";
                 $pend = sqlsrv_query($conSQLLoc, $sql);
                 if ($pend === false) {
