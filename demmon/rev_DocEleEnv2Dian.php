@@ -83,9 +83,9 @@ if ($argc >= 1) {
                     }
                 } else {
                     while ($row = sqlsrv_fetch_array($pend, SQLSRV_FETCH_ASSOC)) {
-                        echo 'Procesando ', $row['fecha'], ' ', $row['prefijo'], '-', $row['folio'], ' ';
                         if (preg_replace("/[^0-9]/", "", $row['folio']) != $row['folio']) {
-                            echo 'Cufe Verificado = 3 ';
+                            echo 'Procesando ', $row['fecha'], ' ', $row['prefijo'], '-', $row['folio'], ' ';
+                            echo 'Cufe Verificado = 3 - Folio con caracteres no permitidos', "\r\n";
                             $sql = "UPDATE dbo.factura_electronica SET cufe_verificado = 3 WHERE id = " . $row['id'];
                             $res = sqlsrv_query($conSQLLoc, $sql);
                             if ($res == false) {
@@ -97,7 +97,6 @@ if ($argc >= 1) {
                                 exit;
                             }
                         } else {
-                            echo 'ReEnviando ';
                             $dir = __DIR__ . DIRECTORY_SEPARATOR;
                             $cmd = "php " . $dir . "renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
                             echo shell_exec($cmd);
