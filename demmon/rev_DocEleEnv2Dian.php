@@ -96,21 +96,7 @@ if ($argc >= 1) {
                                 }
                                 exit;
                             }
-                        }
-                        // else if (valCufeDian($row['cufe'], $row['prefijo'], $row['folio'])) {
-                        //     echo 'Cufe Verificado = 2 ';
-                        //     $sql = "UPDATE dbo.factura_electronica SET cufe_verificado = 2 WHERE id = " . $row['id'];
-                        //     $res = sqlsrv_query($conSQLLoc, $sql);
-                        //     if ($res == false) {
-                        //         echo __LINE__, 'Error actualizando la columna cufe_verificado en factura electronica', "\r\n";
-                        //         $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
-                        //         foreach ($errors as $error) {
-                        //             echo "\r\n", 'ERRORsSQLSucursal: ', __LINE__, ' ', $ipserv, ' ', $error['message'], "\r\n", $sql;
-                        //         }
-                        //         exit;
-                        //     }
-                        // } 
-                        else {
+                        } else {
                             echo 'Renviando ';
                             $dir = __DIR__ . DIRECTORY_SEPARATOR;
                             $cmd = "php " . $dir . "renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
@@ -129,50 +115,4 @@ if ($argc >= 1) {
     }
 } else {
     echo __LINE__, 'Debe ingresar la ip del servidor';
-}
-
-function valCufeDian($cufe, $prefijo, $folio)
-{
-    if ($cufe == '') return false;
-    echo 'Validando cufe ', $cufe, "\r\n";
-    $curl = curl_init();
-    $url  = "http://" . SYS_HOSTMYSQL . "/apidian/public/api/ubl2.1/xml/document/$cufe";
-    curl_setopt_array($curl, [
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_HTTPHEADER => [
-            "Accept: application/json",
-            "Authorization: Bearer 04cde66691dad4b7aea1729558a0c6f6a1f281ad687c6c92e7d5e32f7f445c0d",
-            "Content-Type: application/json"
-        ],
-    ]);
-    $response = curl_exec($curl);
-    $err = curl_error($curl);
-    curl_close($curl);
-    if ($err) {
-        echo __LINE__, " cURL Error #: " . $err, "\r\n";
-        return false;
-    } else {
-        $response = json_decode($response);
-        $xmlqrc = base64_decode($response->ResponseDian->Envelope->Body->GetXmlByDocumentKeyResponse->GetXmlByDocumentKeyResult->XmlBytesBase64);
-        $xmlqrc = str_replace("<ext:", "<ext_", $xmlqrc);
-        $xmlqrc = str_replace("</ext:", "</ext_", $xmlqrc);
-        $xmlqrc = str_replace("<sts:", "<sts_", $xmlqrc);
-        $xmlqrc = str_replace("</sts:", "</sts_", $xmlqrc);
-        $xmlqrc = simplexml_load_string($xmlqrc);
-        $xmlqrc = (array) $xmlqrc;
-        $qrcode = $xmlqrc['ext_UBLExtensions']->ext_UBLExtension[0]->ext_ExtensionContent->sts_DianExtensions->sts_QRCode[0];
-        $qrcode = $qrcode[0];
-        $ini = strpos($qrcode, 'NumFac: ') + 8;
-        $fin = strpos($qrcode, 'FecFac: ') - 1;
-        $len = $fin - $ini;
-        $qrcode = substr($qrcode, $ini, $len);
-        if ($qrcode != ($prefijo . $folio)) return false;
-        else return $response->success;
-    }
 }
