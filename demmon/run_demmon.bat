@@ -8,6 +8,6 @@ set demmon=%1
 set logfile=%date:~0,3%.log
 :: Eliminar archivos log viejos del archivo que se ejecuta
 :: forfiles /p . /s /m %demmon%_%logfile% /d -1 /c "cmd /c del @path"
-forfiles /p . /s /m *%demmon%_%logfile% /d -1 /c "cmd /c echo @path" >> log.txt
+forfiles /p . /s /m *%demmon%*.log /d -1 /c "cmd /c echo @path" >> log.txt
 :: Ejecutar el php indicado con los parametros indicados
 php %demmon%.php %2 %3 %4 %5 >> %demmon%_%logfile%
