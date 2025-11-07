@@ -71,6 +71,20 @@ if ($argc >= 1) {
                     }
                     exit;
                 }
+                $sql = "USE BDES_POS;
+                    IF NOT EXISTS(SELECT 1 FROM sys.columns WHERE Name = N'cufe_anterior' AND Object_ID = Object_ID(N'dbo.factura_electronica'))
+                    BEGIN
+                        EXEC sys.sp_executesql N'ALTER TABLE dbo.factura_electronica ADD cufe_anterior nvarchar(255)';
+                    END";
+                $res = sqlsrv_query($conSQLLoc, $sql);
+                if ($res == false) {
+                    echo __LINE__, 'Error creando la columna cufe_anterior en factura electronica', "\r\n";
+                    $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
+                    foreach ($errors as $error) {
+                        echo "\r\n", 'ERRORsSQLSucursal: ', __LINE__, ' ', $ipserv, ' ', $error['message'], "\r\n", $sql;
+                    }
+                    exit;
+                }
                 $sql = "SELECT TOP 100 PERCENT id, prefijo, folio, cufe, CONVERT(VARCHAR(16), created_at, 121) AS fecha, cufe_verificado
                         FROM BDES_POS.dbo.factura_electronica
                         WHERE CAST(created_at AS DATE) >= CAST(GETDATE() AS DATE) AND (cufe_verificado < 2 OR COALESCE(cufe, '') = '')
