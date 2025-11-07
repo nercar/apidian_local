@@ -322,13 +322,13 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 }
                 $jsObj->legal_monetary_totals->payable_amount = round($jsObj->legal_monetary_totals->tax_inclusive_amount + $recargo, 2);
             }
-            envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number'], $row['cufe']);
+            envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number']);
             echo "\r\n";
         }
     }
 }
 
-function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number, $cufeant)
+function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number)
 {
     $curl = curl_init();
     $url  = "http://" . SYS_HOSTMYSQL . "/apidian/public/api/ubl2.1/";
@@ -387,10 +387,9 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
                 $cufe = $xmldocumentkey;
                 echo 'CD -> ';
             }
-            if ($cufeant == $cufe) $cufeant = NULL;
-            $sql = "MERGE BDES_POS.dbo.factura_electronica AS fe USING (VALUES ('$prefix', '$number', '$cufe', '$cufeant')) AS vn(prefijo, folio, cufe, cufe_anterior)
+            $sql = "MERGE BDES_POS.dbo.factura_electronica AS fe USING (VALUES ('$prefix', '$number', '$cufe')) AS vn(prefijo, folio, cufe)
                     ON fe.prefijo = vn.prefijo AND fe.folio = vn.folio
-                    WHEN MATCHED THEN UPDATE SET cufe = vn.cufe, cufe_verificado = 2, cufe_anterior = vn.cufe_anterior
+                    WHEN MATCHED THEN UPDATE SET cufe = vn.cufe, cufe_verificado = 2
                     WHEN NOT MATCHED THEN INSERT (prefijo, folio, cufe, cufe_verificado) VALUES (vn.prefijo, vn.folio, vn.cufe, 2);";
             $rows = sqlsrv_query($conSQLLoc, $sql);
             if ($rows === false) {
