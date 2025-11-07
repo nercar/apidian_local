@@ -7,6 +7,6 @@
 set demmon=%1
 set logfile=%date:~0,3%.log
 :: Eliminar archivos log viejos 7 días antes del archivo que se ejecuta
-forfiles /p . /s /m *%demmon%*.log /d -7 /c "cmd /c del /q @path" 2>nul
+forfiles /m *%demmon%*.log /d -7 /c "cmd /c del /q @path" 2>nul
 :: Ejecutar el php indicado con los parametros indicados
 php %demmon%.php %2 %3 %4 %5 >> %demmon%_%logfile%
