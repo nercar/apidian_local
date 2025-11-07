@@ -74,7 +74,7 @@ if ($argc >= 1) {
                 $sql = "USE BDES_POS;
                     IF NOT EXISTS(SELECT 1 FROM sys.columns WHERE Name = N'cufe_anterior' AND Object_ID = Object_ID(N'dbo.factura_electronica'))
                     BEGIN
-                        EXEC sys.sp_executesql N'ALTER TABLE dbo.factura_electronica ADD cufe_anterior nvarchar(255)';
+                        EXEC sys.sp_executesql N'ALTER TABLE dbo.factura_electronica ADD cufe_anterior varchar(255) NULL';
                     END";
                 $res = sqlsrv_query($conSQLLoc, $sql);
                 if ($res == false) {
