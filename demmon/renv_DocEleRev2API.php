@@ -18,8 +18,7 @@ if ($argc >= 1) {
                     $prefix = strtoupper($argv[3]);
                     $number = $argv[4];
                 } else {
-                    $number = '0';
-                    $prefix = '';
+                    die('Falta la informacion del prefijo y folio');
                 }
             } else {
                 die('Falta la informacion del servidor y|o prefijo y folio');
@@ -63,9 +62,7 @@ if ($argc >= 1) {
             $ipserv .= $instan == 'n.a' ? '' : chr(92) . $instan;
             $conSQLLoc = CxSQLSUCURSAL::ConectSQL($ipserv);
             // Se ejecuta el query en la tienda para actualizar el precio o insertar el articulo es ESARTICULOS
-            if ($conSQLLoc !== false) {
-                getData($conSQLLoc, $ipserv, $cnx, $number, $prefix);
-            }
+            if ($conSQLLoc !== false) getData($conSQLLoc, $ipserv, $cnx, $number, $prefix);
             $conSQLLoc = null;
             $cnx = null;
         } catch (PDOException $e) {
@@ -108,8 +105,8 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 $jsObj->invoice_period->start_date = date('Y-m-01', strtotime($row['br_issue_date']));
                 $jsObj->invoice_period->end_date = date('Y-m-t', strtotime($row['br_issue_date']));
             }
-            $todayDate = date("Y-m-d", strtotime($row['date']));
-            $dueDate = date("Y-m-d", strtotime($row['date'] . "+ 30 days"));
+            $todayDate = date('Y-m-d');
+            $dueDate = date("Y-m-d", strtotime($todayDate . "+ 30 days"));
             $sdf = $todayDate;
             $jsObj->date = $sdf;
             $jsObj->time = $row['time'];
@@ -151,9 +148,9 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 }
                 $jsObj->customer->identification_number = $row['identification_number'];
                 $jsObj->customer->dv = digitoVer(trim($row['identification_number']));
-                $jsObj->customer->name = $row['name'];
-                $jsObj->customer->phone = $row['phone'];
-                $jsObj->customer->address = $row['addess'];
+                $jsObj->customer->name = mb_convert_encoding($row['name'], mb_detect_encoding($row['name']), 'UTF-8');
+                $jsObj->customer->phone = mb_convert_encoding($row['phone'], mb_detect_encoding($row['phone']), 'UTF-8');
+                $jsObj->customer->address = mb_convert_encoding($row['addess'], mb_detect_encoding($row['addess']), 'UTF-8');
                 $jsObj->customer->merchant_registration = "0000000-00";
                 $jsObj->customer->type_organization_id = $row['type_organization_id'];
                 $jsObj->customer->type_liability_id = $row['type_liability_id'];

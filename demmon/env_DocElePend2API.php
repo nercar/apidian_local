@@ -32,7 +32,7 @@ if ($argc >= 1) {
             DEFINE("SYS_PASS__SQL", "");
             /* CONEXION CON MYSQL */
             DEFINE("SYS_ENGINEMYSQL", "mysql");
-            DEFINE("SYS_HOSTMYSQL", "localhost");
+            DEFINE("SYS_HOSTMYSQL", $ipserv);
             DEFINE("SYS_BBDDMYSQL", "apidian");
             DEFINE("SYS_USERMYSQL", "apidian");
             DEFINE("SYS_PASSMYSQL", "ApiDIAN2024@@");
@@ -171,9 +171,9 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 }
                 $jsObj->customer->identification_number = $row['identification_number'];
                 $jsObj->customer->dv = digitoVer(trim($row['identification_number']));
-                $jsObj->customer->name = $row['name'];
-                $jsObj->customer->phone = $row['phone'];
-                $jsObj->customer->address = $row['addess'];
+                $jsObj->customer->name = mb_convert_encoding($row['name'], mb_detect_encoding($row['name']), 'UTF-8');
+                $jsObj->customer->phone = mb_convert_encoding($row['phone'], mb_detect_encoding($row['phone']), 'UTF-8');
+                $jsObj->customer->address = mb_convert_encoding($row['addess'], mb_detect_encoding($row['addess']), 'UTF-8');
                 $jsObj->customer->merchant_registration = "0000000-00";
                 $jsObj->customer->type_organization_id = $row['type_organization_id'];
                 $jsObj->customer->type_liability_id = $row['type_liability_id'];
@@ -237,7 +237,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                     $detalleFactura->invoiced_quantity = $rowDet['invoiced_quantity'];
                     $detalleFactura->line_extension_amount = $rowDet['line_extension_amount'];
                     $detalleFactura->free_of_charge_indicator = $rowDet['price_amount'] == 0;
-                    $detalleFactura->description = $rowDet['description'];
+                    $detalleFactura->description = mb_convert_encoding($rowDet['description'], mb_detect_encoding($rowDet['description']), 'UTF-8');
                     $detalleFactura->notes = "";
                     $detalleFactura->code = $rowDet['code'];
                     $detalleFactura->type_item_identification_id = 4;
@@ -353,7 +353,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
 function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number)
 {
     $curl = curl_init();
-    $url  = "http://localhost/apidian/public/api/ubl2.1/";
+    $url  = "http://" . SYS_HOSTMYSQL . "/apidian/public/api/ubl2.1/";
     $url .= ($type_document_id == 1) ? 'invoice' : 'credit-note';
     echo " Enviando [$prefix-$number] -> ";
     curl_setopt_array($curl, [
@@ -411,7 +411,7 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
             }
             $sql = "MERGE BDES_POS.dbo.factura_electronica AS fe USING (VALUES ('$prefix', '$number', '$cufe')) AS vn(prefijo, folio, cufe)
                     ON fe.prefijo = vn.prefijo AND fe.folio = vn.folio
-                    WHEN MATCHED THEN UPDATE SET cufe = vn.cufe
+                    WHEN MATCHED THEN UPDATE SET cufe = vn.cufe, cufe_verificado = 2
                     WHEN NOT MATCHED THEN INSERT (prefijo, folio, cufe) VALUES (vn.prefijo, vn.folio, vn.cufe);";
             $rows = sqlsrv_query($conSQLLoc, $sql);
             if ($rows === false) {
@@ -425,7 +425,7 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
             $cnx->query("UPDATE documents SET state_document_id = 1, cufe = '$cufe', updated_at = CURRENT_TIMESTAMP
                         WHERE prefix = '$prefix' AND number = '$number' AND id = $idfac");
             if ($identification_number != "222222222222") {
-                $url  = "http://localhost/apidian/public/api/ubl2.1/send-email";
+                $url  = "http://" . SYS_HOSTMYSQL . "/apidian/public/api/ubl2.1/send-email";
                 echo " Mail [$prefix-$number] -> ";
                 $jsObj = array(
                     "prefix" => "$prefix",
@@ -453,9 +453,7 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
                 $response = curl_exec($curl);
                 $err = curl_error($curl);
                 curl_close($curl);
-                if ($err) {
-                    echo "cURL Error #:" . $err;
-                }
+                if ($err) echo "cURL Error #:" . $err, "\r\n";
             }
             echo $cufe;
         } else {
@@ -482,15 +480,11 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
 
 function digitoVer($nitParam)
 {
-    if ($nitParam == null || trim($nitParam) == '') {
-        return -1;
-    }
+    if ($nitParam == null || trim($nitParam) == '') return -1;
     $nitParam = trim($nitParam);
     $indiceRaya = strpos($nitParam, '-');
     $nitInterno = $indiceRaya > 0 ? substr($nitParam, 0, $indiceRaya) : $nitParam;
-    if (!is_numeric($nitInterno)) {
-        return -1;
-    }
+    if (!is_numeric($nitInterno)) return -1;
     $nitVector = str_split($nitInterno);
     $valorCalculado = 0;
     $aux = count($nitVector) - 1;
@@ -544,8 +538,6 @@ function digitoVer($nitParam)
         }
     }
     $modulo = $valorCalculado % 11;
-    if ($modulo >= 2) {
-        $modulo = 11 - $modulo;
-    }
+    if ($modulo >= 2) $modulo = 11 - $modulo;
     return $modulo;
 }
