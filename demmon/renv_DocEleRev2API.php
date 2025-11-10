@@ -18,7 +18,8 @@ if ($argc >= 1) {
                     $prefix = strtoupper($argv[3]);
                     $number = $argv[4];
                 } else {
-                    die('Falta la informacion del prefijo y folio');
+                    $number = '0';
+                    $prefix = '';
                 }
             } else {
                 die('Falta la informacion del servidor y|o prefijo y folio');
