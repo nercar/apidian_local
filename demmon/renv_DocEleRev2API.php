@@ -21,9 +21,9 @@ if ($argc >= 1) {
                     $number = '0';
                     $prefix = '';
                     if ($argc == 4)
-                        $fecha = 'CAST(DATEADD(day, -' . $argv[3] . ', GETDATE()) AS DATE)';
+                        $fecha = 'CAST(DATEADD(day, -' . $argv[3] . ', GETDATE()) AS DATE) AND created_at < GETDATE()';
                     else
-                        $fecha = 'CAST(DATEADD(day, -3, GETDATE()) AS DATE)';
+                        $fecha = 'CAST(DATEADD(day, -3, GETDATE()) AS DATE) AND created_at < GETDATE()';
                 }
                 if ($argc == 6) {
                 } else {
@@ -74,10 +74,7 @@ if ($argc >= 1) {
                 if ($number != '0') {
                     getData($conSQLLoc, $ipserv, $cnx, $number, $prefix);
                 } else {
-                    $sql = "SELECT * FROM BDES_POS.dbo.factura_electronica WHERE CAST(created_at AS DATE) >= CAST('2025-11-01' AS DATE) AND cufe_verificado < 2;";
-                    // $sql = "SELECT * FROM BDES_POS.dbo.factura_electronica
-                    //         WHERE created_at >= CAST(DATEADD(day, -10, GETDATE()) AS DATE)
-                    //         AND cufe_verificado < 2";
+                    $sql = "SELECT * FROM BDES_POS.dbo.factura_electronica WHERE cufe_verificado < 2 AND $fecha";
                     $pend = sqlsrv_query($conSQLLoc, $sql);
                     if ($pend === false) {
                         $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
