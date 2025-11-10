@@ -62,7 +62,27 @@ if ($argc >= 1) {
             $ipserv .= $instan == 'n.a' ? '' : chr(92) . $instan;
             $conSQLLoc = CxSQLSUCURSAL::ConectSQL($ipserv);
             // Se ejecuta el query en la tienda para actualizar el precio o insertar el articulo es ESARTICULOS
-            if ($conSQLLoc !== false) getData($conSQLLoc, $ipserv, $cnx, $number, $prefix);
+            if ($conSQLLoc !== false) {
+                if ($number != '0') {
+                    getData($conSQLLoc, $ipserv, $cnx, $number, $prefix);
+                } else {
+                    $sql = "SELECT * FROM BDES_POS.dbo.factura_electronica WHERE created_at >= '2025-11-01' AND cufe_verificado < 2;";
+                    // $sql = "SELECT * FROM BDES_POS.dbo.factura_electronica
+                    //         WHERE created_at >= CAST(DATEADD(day, -10, GETDATE()) AS DATE)
+                    //         AND cufe_verificado < 2";
+                    $pend = sqlsrv_query($conSQLLoc, $sql);
+                    if ($pend === false) {
+                        $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
+                        foreach ($errors as $error) {
+                            echo "\r\n", 'ERRORsSQLSucursal: ', __LINE__, ' ', $ipserv, ' ', $error['message'], "\r\n", $sql;
+                        }
+                    } else {
+                        while ($row = sqlsrv_fetch_array($pend, SQLSRV_FETCH_ASSOC)) {
+                            getData($conSQLLoc, $ipserv, $cnx, $row['folio'], $row['prefijo']);
+                        }
+                    }
+                }
+            }
             $conSQLLoc = null;
             $cnx = null;
         } catch (PDOException $e) {
