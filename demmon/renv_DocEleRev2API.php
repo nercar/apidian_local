@@ -108,7 +108,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
         }
     } else {
         while ($row = sqlsrv_fetch_array($heads, SQLSRV_FETCH_ASSOC)) {
-            echo " ... ";
+            echo "[" . $row['date'] . "] ... ";
             $jsObj = new stdClass();
             if ($row['type_document_id'] == 4 && $newtype == 0) {
                 $jsObj->billing_reference = new stdClass();
