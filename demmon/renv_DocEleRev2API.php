@@ -190,7 +190,11 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 }
                 $fpnote .= ' ]';
             }
-            $jsObj->notes = $fnote[0]['fnote_pdf'] . str_repeat('~', 5) . '[ ' . $row['foot_note'] . ' ]' . str_repeat('~', 5) . $fpnote;
+            $jsObj->notes  = $fnote[0]['fnote_pdf'];
+            $jsObj->notes .= str_repeat('~', 5) . '[ ';
+            $jsObj->notes .= mb_convert_encoding($row['foot_note'], mb_detect_encoding($row['foot_note']), 'UTF-8');
+            $jsObj->notes .= ' ]' . str_repeat('~', 5);
+            $jsObj->notes .= $fpnote;
             echo 'P ';
             $sql     = "SELECT * FROM BDES_POS.dbo.fn_detail_fe(?, ?)";
             $datos   = array($number, $prefix);
