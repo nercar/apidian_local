@@ -21,9 +21,9 @@ if ($argc >= 1) {
                     $number = '0';
                     $prefix = '';
                     if ($argc == 4)
-                        $fecha = 'CAST(created_at AS DATE) >= CAST(DATEADD(day, -' . $argv[3] . ', GETDATE()) AS DATE) AND created_at < GETDATE()';
+                        $fecha = 'CAST(created_at AS DATE) >= CAST(DATEADD(day, -' . $argv[3] . ', GETDATE()) AS DATE) AND CAST(created_at AS DATE) < CAST(GETDATE() AS DATE)';
                     else
-                        $fecha = 'CAST(created_at AS DATE) >= CAST(DATEADD(day, -3, GETDATE()) AS DATE) AND created_at < GETDATE()';
+                        $fecha = 'CAST(created_at AS DATE) >= CAST(DATEADD(day, -3, GETDATE()) AS DATE) AND CAST(created_at AS DATE) < CAST(GETDATE() AS DATE)';
                 }
                 if ($argc == 6) {
                 } else {
