@@ -67,7 +67,7 @@ if ($argc >= 1) {
                 if ($number != '0') {
                     getData($conSQLLoc, $ipserv, $cnx, $number, $prefix);
                 } else {
-                    $sql = "SELECT * FROM BDES_POS.dbo.factura_electronica WHERE created_at >= '2025-11-01' AND cufe_verificado < 2;";
+                    $sql = "SELECT * FROM BDES_POS.dbo.factura_electronica WHERE CAST(created_at AS DATE) >= CAST('2025-11-01' AS DATE) AND cufe_verificado < 2;";
                     // $sql = "SELECT * FROM BDES_POS.dbo.factura_electronica
                     //         WHERE created_at >= CAST(DATEADD(day, -10, GETDATE()) AS DATE)
                     //         AND cufe_verificado < 2";
