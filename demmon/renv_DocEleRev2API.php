@@ -20,6 +20,13 @@ if ($argc >= 1) {
                 } else {
                     $number = '0';
                     $prefix = '';
+                    if ($argc == 4)
+                        $fecha = 'CAST(DATEADD(day, -' . $argv[3] . ', GETDATE()) AS DATE)';
+                    else
+                        $fecha = 'CAST(DATEADD(day, -3, GETDATE()) AS DATE)';
+                }
+                if ($argc == 6) {
+                } else {
                 }
             } else {
                 die('Falta la informacion del servidor y|o prefijo y folio');
