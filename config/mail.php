@@ -133,4 +133,23 @@ return [
 
     'log_channel' => env('MAIL_LOG_CHANNEL'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Problem with SSL encrypt - Fix - unsecured
+    |--------------------------------------------------------------------------
+    |
+    | This configuration is updated to prevent errors when
+    | sending mail information with SSL encryption 
+    |
+    */
+
+    'timeout' => null,
+    'stream' => [
+        'ssl' => [
+            'allow_self_signed' => true,
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+        ],
+    ],
+
 ];
