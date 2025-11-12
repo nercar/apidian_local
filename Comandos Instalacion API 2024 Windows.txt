@@ -16,8 +16,12 @@ https://villagrabaez.medium.com/actualizar-php-a-la-versi%C3%B3n-7-4-en-laragon-
 git config --global http.sslverify false
 #git clone https://gitlab.buho.la/facturalatam/co-apidian2024.git apidian
 git clone https://github.com/nercar/apidian_local.git apidian
+
+#Copiar php y mariadb de la carpeta de otros insumos a la carpeta bin php y mysql
+
 cd apidian
-cp demmon/env.txt .env
+
+cp OtrosInsumos/env.txt .env
 rm composer.lock
 composer install
 php artisan config:cache && php artisan cache:clear
