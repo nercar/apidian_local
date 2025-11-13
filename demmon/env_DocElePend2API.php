@@ -5,9 +5,17 @@ if ($argc >= 1) {
     $ipserv = strtolower($argv[2]);
     $strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
     $output = [];
-    $retval = null;
-    exec('tasklist /V | findstr /l "' . $strrun . '"', $output, $retval);
-    if (count($output) <= 2) {
+    $correr = false;
+    if (PHP_OS == 'Linux') {
+        $execstring = "ps aux | grep -v grep | grep '$strrun'";
+        exec($execstring, $output);
+        $correr = (count($output) <= 1);
+    } else {
+        $retval = null;
+        exec('tasklist /V | findstr /l "' . $strrun . '"', $output, $retval);
+        $correr = (count($output) <= 2);
+    }
+    if ($correr) {
         /**
          * Permite obtener los datos de la base de datos y retornarlos
          * en modo json o array

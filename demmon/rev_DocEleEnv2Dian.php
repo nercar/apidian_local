@@ -5,9 +5,17 @@ if ($argc >= 1) {
     $ipserv = strtolower($argv[2]);
     $strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
     $output = [];
-    $retval = null;
-    exec('tasklist /V | findstr /l "' . $strrun . '"', $output, $retval);
-    if (count($output) <= 2) {
+    $correr = false;
+    if (PHP_OS == 'Linux') {
+        $execstring = "ps aux | grep -v grep | grep '$strrun'";
+        exec($execstring, $output);
+        $correr = (count($output) <= 1);
+    } else {
+        $retval = null;
+        exec('tasklist /V | findstr /l "' . $strrun . '"', $output, $retval);
+        $correr = (count($output) <= 2);
+    }
+    if ($correr) {
         /**
          * Permite obtener los datos de la base de datos y retornarlos
          * en modo json o array
@@ -97,9 +105,14 @@ if ($argc >= 1) {
                                 exit;
                             }
                         } else {
-                            $dir = __DIR__ . DIRECTORY_SEPARATOR;
-                            $cmd = "php " . $dir . "renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
-                            echo shell_exec($cmd);
+                            if (PHP_OS == 'Linux') {
+                                $cmd = "php /var/www/html/apidian/demmon/renv_DocEleRev2API2.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
+                                echo exec($cmd), "\r\n";
+                            } else {
+                                $dir = __DIR__ . DIRECTORY_SEPARATOR;
+                                $cmd = "php " . $dir . "renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
+                                echo shell_exec($cmd);
+                            }
                         }
                     }
                 }
