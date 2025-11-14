@@ -2,22 +2,23 @@
 date_default_timezone_set('America/Bogota');
 // Primeros pasos para registrar datos para la ApiDian
 echo str_repeat('=', 30), "\r\n";
+echo "- Ingrese Opcion del sitio -\r\n";
+echo "1. localhost\r\n";
+echo "2. localhost/apidian/public\r\n";
+$site = readline("Ingrese la opción: ");
+switch ($site) {
+    case 1:
+        $site = "localhost";
+        break;
+    case 2:
+        $site = "localhost/apidian/public";
+        break;
+    default:
+        $site = "localhost";
+        break;
+}
 while (true) {
-    echo "- Ingrese Opcion del sitio -\r\n";
-    echo "1. localhost\r\n";
-    echo "2. localhost/apidian/public\r\n";
-    $site = readline("Ingrese la opción: ");
-    switch ($site) {
-        case 1:
-            $site = "localhost";
-            break;
-        case 2:
-            $site = "localhost/apidian/public";
-            break;
-        default:
-            $site = "localhost";
-            break;
-    }
+    echo "Site: $site \r\n";
     echo "--- Opciones Disponibles ---\r\n";
     echo "1. Registrar Empresa\r\n";
     echo "2. Registrar Certificado\r\n";
