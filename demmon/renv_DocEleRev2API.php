@@ -11,6 +11,9 @@ if ($argc >= 1) {
         exec($execstring, $output);
         $correr = (count($output) <= 1);
         $site = "localhost";
+        echo "\r\n";
+        echo $execstring, '-', count($output);
+        print_r($output);
     } else {
         $strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
         $retval = null;
@@ -106,11 +109,6 @@ if ($argc >= 1) {
             print_r($e);
             die();
         }
-    } else {
-        echo "\r\n";
-        echo $execstring, '-', count($output);
-        print_r($output);
-        echo "\r\n se esta ejecutando\r\n";
     }
 } else {
     echo 'Debe ingresar la ip del servidor';
