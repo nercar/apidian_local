@@ -3,15 +3,16 @@ if ($argc >= 1) {
     $demonio = $argv[0];
     $instan = strtolower($argv[1]);
     $ipserv = strtolower($argv[2]);
-    $strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
     $output = [];
     $correr = false;
     if (PHP_OS == 'Linux') {
+        $strrun = trim($demonio . ' ' . $instan . ' ' . $ipserv);
         $execstring = "ps aux | grep -v grep | grep '$strrun'";
         exec($execstring, $output);
         $correr = (count($output) <= 1);
         $site = "localhost";
     } else {
+        $strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
         $retval = null;
         exec('tasklist /V | findstr /l "' . $strrun . '"', $output, $retval);
         $correr = (count($output) <= 2);
