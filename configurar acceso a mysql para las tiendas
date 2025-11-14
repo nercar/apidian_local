@@ -39,17 +39,17 @@ echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
 source ~/.bashrc
 apt-get install -y unixodbc-dev
 
-apt-get -y install php-pear php7.3-dev
-update-alternatives --set php /usr/bin/php7.3
-update-alternatives --set phar /usr/bin/phar7.3
-update-alternatives --set phar.phar /usr/bin/phar.phar7.3
-update-alternatives --set phpize /usr/bin/phpize7.3
-update-alternatives --set php-config /usr/bin/php-config7.3
+apt-get -y install php-pear php7.4-dev
+update-alternatives --set php /usr/bin/php7.4
+update-alternatives --set phar /usr/bin/phar7.4
+update-alternatives --set phar.phar /usr/bin/phar.phar7.4
+update-alternatives --set phpize /usr/bin/phpize7.4
+update-alternatives --set php-config /usr/bin/php-config7.4
 
-pecl -d php_suffix=7.3 install sqlsrv-5.8.1
-pecl -d php_suffix=7.3 install pdo_sqlsrv-5.8.1
+pecl -d php_suffix=7.4 install sqlsrv-5.8.1
+pecl -d php_suffix=7.4 install pdo_sqlsrv-5.8.1
 
-printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/7.3/mods-available/sqlsrv.ini
-printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/7.3/mods-available/pdo_sqlsrv.ini
-phpenmod -v 7.3 sqlsrv pdo_sqlsrv
+printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/7.4/mods-available/sqlsrv.ini
+printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/7.4/mods-available/pdo_sqlsrv.ini
+phpenmod -v 7.4 sqlsrv pdo_sqlsrv
 service apache2 restart

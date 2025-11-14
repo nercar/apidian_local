@@ -32,7 +32,7 @@ if ($argc >= 1) {
             DEFINE("SYS_PASS__SQL", "");
             /* CONEXION CON MYSQL */
             DEFINE("SYS_ENGINEMYSQL", "mysql");
-            DEFINE("SYS_HOSTMYSQL", $ipserv);
+            DEFINE("SYS_HOSTMYSQL", "localhost");
             DEFINE("SYS_BBDDMYSQL", "apidian");
             DEFINE("SYS_USERMYSQL", "apidian");
             DEFINE("SYS_PASSMYSQL", "ApiDIAN2024@@");
