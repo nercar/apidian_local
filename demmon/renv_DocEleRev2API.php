@@ -106,6 +106,8 @@ if ($argc >= 1) {
             print_r($e);
             die();
         }
+    } else {
+        echo 'se esta ejecutando';
     }
 } else {
     echo 'Debe ingresar la ip del servidor';
