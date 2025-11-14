@@ -10,7 +10,22 @@ $json = file_get_contents('cajas.json');
 if ($json === false) {
     throw new \Exception("Error leyendo archivo .json");
 }
-$url = 'http://localhost/apidian/public/api/ubl2.1/config/resolution';
+echo "- Ingrese Opcion del sitio -\r\n";
+echo "1. localhost\r\n";
+echo "2. localhost/apidian/public\r\n";
+$site = readline("Ingrese la opción: ");
+switch ($site) {
+    case 1:
+        $site = "localhost";
+        break;
+    case 2:
+        $site = "localhost/apidian/public";
+        break;
+    default:
+        $site = "localhost";
+        break;
+}
+$url = "http://$site/api/ubl2.1/config/resolution";
 $datos = json_decode($json, true);
 if (count($datos) == 0) {
     echo "Debe agrgar la información de las\r\nresoluciones al archivo cajas.json";
