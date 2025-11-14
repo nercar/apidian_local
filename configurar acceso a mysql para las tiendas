@@ -53,3 +53,13 @@ printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/7.4/mods-available/sqls
 printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/7.4/mods-available/pdo_sqlsrv.ini
 phpenmod -v 7.4 sqlsrv pdo_sqlsrv
 service apache2 restart
+
+# Para corregir el error de ssl de conexion con sql server
+wget https://www.openssl.org/source/openssl-1.1.1p.tar.gz -O openssl-1.1.1p.tar.gz
+tar -zxvf openssl-1.1.1p.tar.gz
+cd openssl-1.1.1p
+./config
+make
+sudo make install
+sudo ldconfig
+openssl version
