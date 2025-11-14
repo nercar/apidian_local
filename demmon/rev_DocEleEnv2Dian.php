@@ -106,8 +106,7 @@ if ($argc >= 1) {
                             }
                         } else {
                             if (PHP_OS == 'Linux') {
-                                $cmd = "php /var/www/html/apidian/demmon/renv_DocEleRev2API2.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
-                                echo $cmd;
+                                $cmd = "php /var/www/html/apidian/demmon/renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
                                 echo exec($cmd), "\r\n";
                             } else {
                                 $dir = __DIR__ . DIRECTORY_SEPARATOR;
