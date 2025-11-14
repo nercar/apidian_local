@@ -5,11 +5,7 @@ echo str_repeat('=', 30), "\r\n";
 echo "Registrar resoluciones de cajas\r\n";
 echo "Debe existir el archivo cajas.json\r\n";
 echo "con la información de las resoluciones\r\n";
-// Se establece la conexion con la BBDD
-$json = file_get_contents('cajas.json');
-if ($json === false) {
-    throw new \Exception("Error leyendo archivo .json");
-}
+echo "======================================\r\n";
 echo "- Ingrese Opcion del sitio -\r\n";
 echo "1. localhost\r\n";
 echo "2. localhost/apidian/public\r\n";
@@ -26,6 +22,11 @@ switch ($site) {
         break;
 }
 $url = "http://$site/api/ubl2.1/config/resolution";
+// Se establece la conexion con la BBDD
+$json = file_get_contents('cajas.json');
+if ($json === false) {
+    throw new \Exception("Error leyendo archivo .json");
+}
 $datos = json_decode($json, true);
 if (count($datos) == 0) {
     echo "Debe agrgar la información de las\r\nresoluciones al archivo cajas.json";
