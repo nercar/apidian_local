@@ -39,6 +39,11 @@ mysql -u root
 CREATE USER 'apidian'@'%' IDENTIFIED BY 'uZ78R';
 GRANT ALL PRIVILEGES ON * . * TO 'apidian'@'%';
 FLUSH PRIVILEGES;
+CREATE USER 'apidian'@'localhost' IDENTIFIED BY 'ApiDIAN2024@@';
+GRANT ALL PRIVILEGES ON * . * TO 'apidian'@'localhost';
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'passw0rd';
+FLUSH PRIVILEGES;
 CREATE DATABASE apidian CHARACTER SET utf8 COLLATE utf8_spanish_ci;
 exit
 
@@ -49,9 +54,10 @@ mv composer.phar /usr/local/bin/composer
 #INSTALAR APIDDIAN
 cd /var/www/html/
 git config --global http.sslverify false
-git clone https://gitlab.buho.la/facturalatam/co-apidian2024.git apidian
+#git clone https://gitlab.buho.la/facturalatam/co-apidian2024.git apidian
+git clone https://github.com/nercar/apidian_local.git apidian
 cd apidian
-cp .env.example .env
+cp OtrosInsumos/env.txt .env
 nano .env
 
 #CAMBIAR LA CADENA DE CONEXIÓN EN EL ARCHIVO .env asignando el puerto configurado anteriormente
