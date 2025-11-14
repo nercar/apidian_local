@@ -10,10 +10,12 @@ if ($argc >= 1) {
         $execstring = "ps aux | grep -v grep | grep '$strrun'";
         exec($execstring, $output);
         $correr = (count($output) <= 1);
+        $site = "localhost";
     } else {
         $retval = null;
         exec('tasklist /V | findstr /l "' . $strrun . '"', $output, $retval);
         $correr = (count($output) <= 2);
+        $site = "$ipserv/apidian/public";
     }
     if ($correr) {
         /**
@@ -80,7 +82,7 @@ if ($argc >= 1) {
             // Se ejecuta el query en la tienda para actualizar el precio o insertar el articulo es ESARTICULOS
             if ($conSQLLoc !== false) {
                 if ($number != '0') {
-                    getData($conSQLLoc, $ipserv, $cnx, $number, $prefix);
+                    getData($conSQLLoc, $ipserv, $cnx, $number, $prefix, $site);
                 } else {
                     $sql = "SELECT * FROM BDES_POS.dbo.factura_electronica WHERE cufe_verificado < 2 AND $fecha";
                     $pend = sqlsrv_query($conSQLLoc, $sql);
@@ -91,7 +93,7 @@ if ($argc >= 1) {
                         }
                     } else {
                         while ($row = sqlsrv_fetch_array($pend, SQLSRV_FETCH_ASSOC)) {
-                            getData($conSQLLoc, $ipserv, $cnx, $row['folio'], $row['prefijo']);
+                            getData($conSQLLoc, $ipserv, $cnx, $row['folio'], $row['prefijo'], $site);
                         }
                     }
                 }
@@ -108,7 +110,7 @@ if ($argc >= 1) {
     echo 'Debe ingresar la ip del servidor';
 }
 
-function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
+function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $site, $newtype = 0)
 {
     echo date('Y.m.d H:i:s'), " Procesando [$prefix-$number] ";
     $sql   = "SELECT * FROM BDES_POS.dbo.fn_header_fe($number, '$prefix')";
@@ -359,16 +361,16 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $newtype = 0)
                 }
                 $jsObj->legal_monetary_totals->payable_amount = round($jsObj->legal_monetary_totals->tax_inclusive_amount + $recargo, 2);
             }
-            envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number']);
+            envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $row['type_document_id'], $row['identification_number'], $site);
             echo "\r\n";
         }
     }
 }
 
-function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number)
+function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_document_id, $identification_number, $site)
 {
     $curl = curl_init();
-    $url  = "http://" . SYS_HOSTMYSQL . "/apidian/public/api/ubl2.1/";
+    $url  = "http://$site/api/ubl2.1/";
     $url .= ($type_document_id == 1) ? 'invoice' : 'credit-note';
     echo " Enviando [$prefix-$number] -> ";
     curl_setopt_array($curl, [
@@ -440,7 +442,7 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
             $cnx->query("UPDATE documents SET state_document_id = 1, cufe = '$cufe', updated_at = CURRENT_TIMESTAMP
                         WHERE prefix = '$prefix' AND number = '$number' AND id = $idfac");
             if ($identification_number != "222222222222") {
-                $url  = "http://" . SYS_HOSTMYSQL . "/apidian/public/api/ubl2.1/send-email";
+                $url  = "http://$site/api/ubl2.1/send-email";
                 echo " Mail [$prefix-$number] -> ";
                 $jsObj = array(
                     "prefix" => "$prefix",
@@ -483,7 +485,7 @@ function envJson2Api($conSQLLoc, $tienda, $cnx, $number, $prefix, $jsObj, $type_
             } else {
                 $reglaLGC15 = json_encode($response->ResponseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->ErrorMessage);
                 if (stripos($reglaLGC15, 'Regla: LGC15, Rechazo:')) {
-                    getData($conSQLLoc, $tienda, $cnx, $number, $prefix, 4);
+                    getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $site, 4);
                 } else {
                     echo __LINE__, ' ', json_encode($response->ResponseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->ErrorMessage), "\r\n";
                     echo __LINE__, ' ', json_encode($response->ResponseDian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->StatusMessage);
