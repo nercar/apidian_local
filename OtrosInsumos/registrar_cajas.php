@@ -31,9 +31,6 @@ $datos = json_decode($json, true);
 if (count($datos) == 0) {
     echo "Debe agrgar la información de las\r\nresoluciones al archivo cajas.json";
 } else {
-    echo $url, "\r\n";
-    print_r($datos);
-    exit;
     foreach ($datos as $row) {
         echo "Registrando " . $row['Prefix'];
         $jsObj = new stdClass();
@@ -47,7 +44,7 @@ if (count($datos) == 0) {
         $jsObj->generated_to_date = "0";
         $jsObj->date_from = $row['ValidDateFrom'];
         $jsObj->date_to = $row['ValidDateTo'];
-        envJson2Api($jsObj);
+        envJson2Api($jsObj, $url);
         $prenc = substr_replace($row['Prefix'], "D", 0, 1);
         echo " - " . $prenc, "\r\n";
         $jsObj = new stdClass();
@@ -56,17 +53,17 @@ if (count($datos) == 0) {
         $jsObj->to = 99999999;
         $jsObj->prefix = $prenc;
         $jsObj->resolution = $row['ResolutionNumber'];
-        envJson2Api($jsObj);
+        envJson2Api($jsObj, $url);
         echo str_repeat('=', 30), "\r\n";
     }
 }
 
 // Funcion de enviar la informacion a la APIDian
-function envJson2Api($jsObj)
+function envJson2Api($jsObj, $url)
 {
     $curl = curl_init();
     curl_setopt_array($curl, [
-        CURLOPT_URL => "http://localhost/apidian/public/api/ubl2.1/config/resolution",
+        CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
