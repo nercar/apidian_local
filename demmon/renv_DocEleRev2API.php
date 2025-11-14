@@ -18,6 +18,9 @@ if ($argc >= 1) {
         $correr = (count($output) <= 2);
         $site = "$ipserv/apidian/public";
     }
+    echo "\r\n";
+    echo $execstring, '-', count($output);
+    print_r($output);
     if ($correr) {
         /**
          * Permite obtener los datos de la base de datos y retornarlos
@@ -107,9 +110,6 @@ if ($argc >= 1) {
             die();
         }
     } else {
-        echo "\r\n";
-        echo $execstring, '-', count($output);
-        print_r($output);
         echo "\r\n se esta ejecutando\r\n";
     }
 } else {
