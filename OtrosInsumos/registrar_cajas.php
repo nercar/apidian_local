@@ -31,6 +31,9 @@ $datos = json_decode($json, true);
 if (count($datos) == 0) {
     echo "Debe agrgar la información de las\r\nresoluciones al archivo cajas.json";
 } else {
+    echo $url, "\r\n";
+    print_r($datos);
+    exit;
     foreach ($datos as $row) {
         echo "Registrando " . $row['Prefix'];
         $jsObj = new stdClass();
