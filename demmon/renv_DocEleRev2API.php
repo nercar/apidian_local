@@ -11,6 +11,7 @@ if ($argc >= 1) {
         exec($execstring, $output);
         $correr = (count($output) <= 1);
         $site = "localhost";
+        print_r($output);
     } else {
         $strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
         $retval = null;
@@ -107,7 +108,6 @@ if ($argc >= 1) {
             die();
         }
     } else {
-        print_r($output);
         echo __LINE__, ' ', $execstring, ' ', count($output);
     }
 } else {
