@@ -9,12 +9,8 @@ if ($argc >= 1) {
         $strrun = trim($demonio . ' ' . $instan . ' ' . $ipserv);
         $execstring = "ps aux | grep -v grep | grep '$strrun'";
         exec($execstring, $output);
-        echo $execstring, '-', count($output);
-        print_r($output);
-        $correr = (count($output) <= 1);
+        $correr = (count($output) <= 2);
         $site = "localhost";
-        echo "\r\n";
-        exit;
     } else {
         $strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
         $retval = null;
