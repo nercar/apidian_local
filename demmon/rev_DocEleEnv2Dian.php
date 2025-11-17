@@ -109,7 +109,7 @@ if ($argc >= 1) {
                             $dir = __DIR__ . DIRECTORY_SEPARATOR;
                             $cmd = "php " . $dir . "renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
                             if (PHP_OS == 'Linux') {
-                                echo PHP_OS, '-', exec($cmd);
+                                echo exec($cmd);
                             } else {
                                 echo shell_exec($cmd);
                             }
