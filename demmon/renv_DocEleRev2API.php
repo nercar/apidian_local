@@ -107,6 +107,7 @@ if ($argc >= 1) {
             die();
         }
     } else {
+        print_r($output);
         echo __LINE__, ' ', $execstring, ' ', count($output);
     }
 } else {
