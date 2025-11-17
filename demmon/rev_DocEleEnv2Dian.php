@@ -106,13 +106,11 @@ if ($argc >= 1) {
                                 exit;
                             }
                         } else {
+                            $dir = __DIR__ . DIRECTORY_SEPARATOR;
+                            $cmd = "php " . $dir . "renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
                             if (PHP_OS == 'Linux') {
-                                $cmd = "php /var/www/html/apidian/demmon/renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
-                                echo $cmd, "\r\n";
-                                // echo exec($cmd);
+                                echo exec($cmd);
                             } else {
-                                $dir = __DIR__ . DIRECTORY_SEPARATOR;
-                                $cmd = "php " . $dir . "renv_DocEleRev2API.php $instan $iptienda " . $row['prefijo'] . ' ' . $row['folio'];
                                 echo shell_exec($cmd);
                             }
                         }
