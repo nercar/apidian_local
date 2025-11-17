@@ -28,7 +28,7 @@ C:\Program Files (x86)\Microsoft SQL Server\100\DTS\Binn\;C:\WINDOWS;
 C:\WINDOWS\system32;%JAVA_HOME%\bin
 
 
-Para instalar los drivers de sql server en php7.3
+Para instalar los drivers de sql server en php7.4
 
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
 curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list

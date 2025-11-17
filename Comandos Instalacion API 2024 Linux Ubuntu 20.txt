@@ -70,6 +70,17 @@ DB_PASSWORD=uZ78R
 
 rm composer.lock
 composer install
+
+#Si sale error de seguridad de los paquetes de pdf colocal lo siguiente en config.json
+{
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
+    }
+}
+
+
 php artisan key:generate
 unzip storage.zip
 # aceptar los cambios al descomprimir
