@@ -14,6 +14,7 @@ if ($argc >= 1) {
         echo "\r\n";
         echo $execstring, '-', count($output);
         print_r($output);
+        exit;
     } else {
         $strrun = trim($demonio . '.php ' . $instan . ' ' . $ipserv);
         $retval = null;
