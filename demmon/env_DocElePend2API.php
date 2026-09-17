@@ -159,7 +159,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $site, $newtype = 
             if (filter_var(trim($row['email']), FILTER_VALIDATE_EMAIL)) {
                 $emailcclist->email = trim($row['email']);
             } else {
-                $emailcclist->email = 'consumidorfinalsuperlosmontes@gmail.com';
+                $emailcclist->email = 'consumidorfinalf3@gmail.com';
             }
             array_push($jsObj->email_cc_list, $emailcclist);
             echo 'H ';
@@ -178,7 +178,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $site, $newtype = 
                 if (filter_var(trim($row['email']), FILTER_VALIDATE_EMAIL)) {
                     $jsObj->customer->email = trim($row['email']);
                 } else {
-                    $jsObj->customer->email = 'consumidorfinalsuperlosmontes@gmail.com';
+                    $jsObj->customer->email = 'consumidorfinalf3@gmail.com';
                 }
                 $jsObj->customer->identification_number = $row['identification_number'];
                 $jsObj->customer->dv = digitoVer(trim($row['identification_number']));

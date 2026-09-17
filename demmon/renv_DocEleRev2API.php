@@ -24,6 +24,7 @@ if ($argc >= 1) {
          * en modo json o array
          */
         try {
+            $fecha = '';
             if ($argc > 1) {
                 if ($argc == 5) {
                     $prefix = strtoupper($argv[3]);
@@ -85,7 +86,7 @@ if ($argc >= 1) {
                 if ($number != '0') {
                     getData($conSQLLoc, $ipserv, $cnx, $number, $prefix, $site);
                 } else {
-                    $sql = "SELECT * FROM BDES_POS.dbo.factura_electronica WHERE cufe_verificado < 2 AND $fecha";
+                    $sql = "SELECT TOP 100 * FROM BDES_POS.dbo.factura_electronica WHERE cufe_verificado < 2 AND $fecha";
                     $pend = sqlsrv_query($conSQLLoc, $sql);
                     if ($pend === false) {
                         $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
@@ -161,7 +162,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $site, $newtype = 
             if (filter_var(trim($row['email']), FILTER_VALIDATE_EMAIL)) {
                 $emailcclist->email = trim($row['email']);
             } else {
-                $emailcclist->email = 'consumidorfinalsuperlosmontes@gmail.com';
+                $emailcclist->email = 'consumidorfinalf3@gmail.com';
             }
             array_push($jsObj->email_cc_list, $emailcclist);
             echo 'H ';
@@ -180,7 +181,7 @@ function getData($conSQLLoc, $tienda, $cnx, $number, $prefix, $site, $newtype = 
                 if (filter_var(trim($row['email']), FILTER_VALIDATE_EMAIL)) {
                     $jsObj->customer->email = trim($row['email']);
                 } else {
-                    $jsObj->customer->email = 'consumidorfinalsuperlosmontes@gmail.com';
+                    $jsObj->customer->email = 'consumidorfinalf3@gmail.com';
                 }
                 $jsObj->customer->identification_number = $row['identification_number'];
                 $jsObj->customer->dv = digitoVer(trim($row['identification_number']));
