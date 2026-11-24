@@ -36,3 +36,12 @@ php artisan config:cache && php artisan config:clear && php artisan cache:clear
 urn_on.bat
 
 
+#Configurar laragon para que se inicie como servicio
+#Verificar el directorio de instalacion de laragon para modificar el disco c:\
+D:\laragon\bin\apache\httpd-2.4.54-win64-VS16\bin\httpd.exe -k install -n "LaragonApache"
+D:\laragon\bin\mysql\mariadb-10.5.10-winx64\bin\mysqld.exe --install "LaragonMariaDB"
+
+
+#Borrar servicios
+sc delete LaragonApache
+sc delete LaragonMariaDB
